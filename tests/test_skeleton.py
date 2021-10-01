@@ -2,9 +2,9 @@ import pytest
 
 from pyevaluationengine.skeleton import fib, main
 
-__author__ = "TrisCC"
-__copyright__ = "TrisCC"
-__license__ = "MIT"
+__author__ = "LUDev"
+__copyright__ = "LUDev"
+__license__ = "BSD 3-Clause License"
 
 
 def test_fib():

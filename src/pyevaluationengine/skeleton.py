@@ -24,11 +24,11 @@ import argparse
 import logging
 import sys
 
-from pyevaluationengine import __version__
+from .__version__ import __version__
 
-__author__ = "TrisCC"
-__copyright__ = "TrisCC"
-__license__ = "MIT"
+__author__ = "LUDev"
+__copyright__ = "LUDev"
+__license__ = "BSD 3-Clause License"
 
 _logger = logging.getLogger(__name__)
 
