@@ -1,28 +1,3 @@
-.. todo:: THIS IS SUPPOSED TO BE AN EXAMPLE. MODIFY IT ACCORDING TO YOUR NEEDS!
-
-   The document assumes you are using a source repository service that promotes a
-   contribution model similar to `GitHub's fork and pull request workflow`_.
-   While this is true for the majority of services (like GitHub, GitLab,
-   BitBucket), it might not be the case for private repositories (e.g., when
-   using Gerrit).
-
-   Also notice that the code examples might refer to GitHub URLs or the text
-   might use GitHub specific terminology (e.g., *Pull Request* instead of *Merge
-   Request*).
-
-   Please make sure to check the document having these assumptions in mind
-   and update things accordingly.
-
-.. todo:: Provide the correct links/replacements at the bottom of the document.
-
-.. todo:: You might want to have a look on `PyScaffold's contributor's guide`_,
-
-   especially if your project is open source. The text should be very similar to
-   this template, but there are a few extra contents that you might decide to
-   also include, like mentioning labels of your issue tracker or automated
-   releases.
-
-
 ============
 Contributing
 ============
@@ -71,26 +46,21 @@ by adding missing information and correcting mistakes.
 ``pyevaluationengine`` documentation uses Sphinx_ as its main documentation compiler.
 This means that the docs are kept in the same repository as the project code, and
 that any documentation update is done in the same way was a code contribution.
+We use reStructuredText_ as our markup language
 
-.. todo:: Don't forget to mention which markup language you are using.
+.. tip::
+  Please notice that the `GitHub web interface`_ provides a quick way of
+  propose changes in ``pyevaluationengine``'s files. While this mechanism can
+  be tricky for normal code contributions, it works perfectly fine for
+  contributing to the docs, and can be quite handy.
 
-    e.g.,  reStructuredText_ or CommonMark_ with MyST_ extensions.
-
-.. todo:: If your project is hosted on GitHub, you can also mention the following tip:
-
-   .. tip::
-      Please notice that the `GitHub web interface`_ provides a quick way of
-      propose changes in ``pyevaluationengine``'s files. While this mechanism can
-      be tricky for normal code contributions, it works perfectly fine for
-      contributing to the docs, and can be quite handy.
-
-      If you are interested in trying this method out, please navigate to
-      the ``docs`` folder in the source repository_, find which file you
-      would like to propose changes and click in the little pencil icon at the
-      top, to open `GitHub's code editor`_. Once you finish editing the file,
-      please write a message in the form at the bottom of the page describing
-      which changes have you made and what are the motivations behind them and
-      submit your proposal.
+  If you are interested in trying this method out, please navigate to
+  the ``docs`` folder in the source repository_, find which file you
+  would like to propose changes and click in the little pencil icon at the
+  top, to open `GitHub's code editor`_. Once you finish editing the file,
+  please write a message in the form at the bottom of the page describing
+  which changes have you made and what are the motivations behind them and
+  submit your proposal.
 
 When working on documentation changes in your local machine, you can
 compile them using |tox|_::
@@ -105,12 +75,6 @@ and use Python's built-in web server for a preview in your web browser
 
 Code Contributions
 ==================
-
-.. todo:: Please include a reference or explanation about the internals of the project.
-
-   An architecture description, design principles or at least a summary of the
-   main concepts will make it easy for potential contributors to get started
-   quickly.
 
 Submit an issue
 ---------------
@@ -142,8 +106,8 @@ Clone the repository
    page. This creates a copy of the code under your account on |the repository service|.
 #. Clone this copy to your local disk::
 
-    git clone git@github.com:YourLogin/pyevaluationengine.git
-    cd pyevaluationengine
+    git clone git@github.com:ludev-nl/2021-01-pyEvaluationEngine.git
+    cd 2021-01-pyEvaluationEngine
 
 #. You should run::
 
@@ -151,15 +115,6 @@ Clone the repository
 
    to be able run ``putup --help``.
 
-   .. todo:: if you are not using pre-commit, please remove the following item:
-
-#. Install |pre-commit|_::
-
-    pip install pre-commit
-    pre-commit install
-
-   ``pyevaluationengine`` comes with a lot of hooks configured to automatically help the
-   developer to check the code being written.
 
 Implement your changes
 ----------------------
@@ -181,13 +136,6 @@ Implement your changes
     git commit
 
    to record your changes in git_.
-
-   .. todo:: if you are not using pre-commit, please remove the following item:
-
-   Please make sure to see the validation messages from |pre-commit|_ and fix
-   any eventual issues.
-   This should automatically use flake8_/black_ to check/fix the code style
-   in a way that is compatible with the project.
 
    .. important:: Don't forget to add unit tests and documentation in case your
       contribution adds an additional feature and is not just a bugfix.
@@ -218,11 +166,10 @@ Submit your contribution
 #. Go to the web page of your fork and click |contribute button|
    to send your changes for review.
 
-   .. todo:: if you are using GitHub, you can uncomment the following paragraph
 
-      Find more detailed information `creating a PR`_. You might also want to open
-      the PR as a draft first and mark it as ready for review after the feedbacks
-      from the continuous integration (CI) system or any required fixes.
+Find more detailed information `creating a PR`_. You might also want to open
+the PR as a draft first and mark it as ready for review after the feedbacks
+from the continuous integration (CI) system or any required fixes.
 
 
 Troubleshooting
@@ -278,11 +225,6 @@ Maintainer tasks
 Releases
 --------
 
-.. todo:: This section assumes you are using PyPI to publicly release your package.
-
-   If instead you are using a different/private package index, please update
-   the instructions accordingly.
-
 If you are part of the group of maintainers and have correct user permissions
 on PyPI_, the following steps can be used to release a new version for
 ``pyevaluationengine``:
@@ -308,14 +250,13 @@ on PyPI_, the following steps can be used to release a new version for
    of environments, including private companies and proprietary code bases.
 
 
-.. <-- strart -->
-.. todo:: Please review and change the following definitions:
+.. <-- start -->
 
 .. |the repository service| replace:: GitHub
 .. |contribute button| replace:: "Create pull request"
 
-.. _repository: https://github.com/<USERNAME>/pyevaluationengine
-.. _issue tracker: https://github.com/<USERNAME>/pyevaluationengine/issues
+.. _repository: https://github.com/ludev-nl/2021-01-pyEvaluationEngine
+.. _issue tracker: https://github.com/ludev-nl/2021-01-pyEvaluationEngine/issues
 .. <-- end -->
 
 
