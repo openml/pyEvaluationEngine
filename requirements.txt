@@ -1,1 +1,8 @@
 pandas
+requests
+pytest
+pytest-cov
+tox
+setuptools
+setuptools_scm
+wheel
