@@ -1,4 +1,3 @@
-import argparse
 import json
 import logging
 import os
@@ -8,16 +7,7 @@ import requests
 
 from pyevaluationengine import config
 
-from .__version__ import __version__
-
-__author__ = "LUDev"
-__copyright__ = "LUDev"
-__license__ = "BSD 3-Clause License"
-
 _logger = logging.getLogger(__name__)
-
-
-# ---- Python API ----
 
 
 class EvaluationEngine:
@@ -27,11 +17,13 @@ class EvaluationEngine:
 
     # Get IDs of unprocessed datasets
     def get_data_ids(self):
-        response = requests.get(self.url + "unprocessed/0/normal", params={'api_key': self.apikey})
+        _logger.info("Fetching ID of unprocessed datasets")
+        response = requests.get(self.url + "/data/unprocessed/0/normal", params={'api_key': self.apikey})
         datasets = json.loads(response.text)
         data_ids = []
-        for key in datasets['data_unprocessed']: 
+        for key in datasets['data_unprocessed']:
             data_ids.append(datasets['data_unprocessed'][key]['did'])
+            _logger.debug(f'Found unprocessed dataset: {data_ids[-1]}')
         return data_ids
 
     # Downloads dataset and store as temp.arff
@@ -60,39 +52,6 @@ class EvaluationEngine:
             os.remove('temp.arff')
 
 
-# ---- CLI ----
-
-
-def parse_args(args):
-    parser = argparse.ArgumentParser(description="Python EvaluationEngine for the OpenML project")
-    parser.add_argument(
-        "--version",
-        action="version",
-        version="pyevaluationengine {ver}".format(ver=__version__),
-    )
-    parser.add_argument(
-        "-h",
-        action="help",
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        dest="loglevel",
-        help="set loglevel to INFO",
-        action="store_const",
-        const=logging.INFO,
-    )
-    parser.add_argument(
-        "-vv",
-        "--very-verbose",
-        dest="loglevel",
-        help="set loglevel to DEBUG",
-        action="store_const",
-        const=logging.DEBUG,
-    )
-    return parser.parse_args(args)
-
-
 def setup_logging(loglevel):
     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(
@@ -100,16 +59,13 @@ def setup_logging(loglevel):
     )
 
 
-def main(args):
-    args = parse_args(args)
-    setup_logging(args.loglevel)
+def main():
+    setup_logging(logging.DEBUG)
 
-    # TODO: Write help function if -h tag is given
+    engine = EvaluationEngine(config.testing['url'], config.testing['apikey'])
 
-    # TODO: Initialize EvaluationEngine object
-
-    # TODO: Do something with the EvaluationEngine based on the given arguments
+    EvaluationEngine.get_data_ids(engine)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
