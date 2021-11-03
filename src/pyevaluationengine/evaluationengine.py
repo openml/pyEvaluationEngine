@@ -34,9 +34,6 @@ class EvaluationEngine:
 
     # Upload dataset
     def upload_dataset(self):
-
-        # TODO: Upload dataset back to the server
-
         return
 
     # Process dataset
@@ -45,8 +42,6 @@ class EvaluationEngine:
 
         for data_id in data_ids:
             self.download_dataset(data_id)
-
-            # TODO: process arff file using PyMFE
 
             self.upload_dataset()
             os.remove('temp.arff')

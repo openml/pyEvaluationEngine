@@ -49,9 +49,6 @@ def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
 
-    # TODO: Initialize EvaluationEngine object
-
-    # TODO: Do something with the EvaluationEngine based on the given arguments
 
 def run():
     main(sys.argv[1:])
