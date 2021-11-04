@@ -6,4 +6,3 @@ tox
 setuptools
 setuptools_scm
 wheel
-importlib-metadata
