@@ -1,4 +1,4 @@
-name: pyEvaluationEngine tox
+name: tox
 
 on:
   - push
