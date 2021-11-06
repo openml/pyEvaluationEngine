@@ -1,11 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\docs",
-    "\\docs\\_static",
     "\\src",
-    "\\src\\pyevaluationengine",
-    "\\tests"
+    "\\src\\pyevaluationengine"
   ],
   "SelectedNode": "\\src\\pyevaluationengine\\main.py",
   "PreviewInSolutionExplorer": false

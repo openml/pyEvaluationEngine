@@ -1,4 +1,4 @@
-import openml.datasets as dt
+import openml as oml
 from pymfe.mfe import MFE
 import arff
 import pandas as pd
@@ -6,8 +6,12 @@ import numpy as np
 import requests
 import json
 import os
+from dicttoxml import dicttoxml
 
 api_key = "07ba2f75d031ff6997b8f93d466f1f1e"
+
+oml.config.server = 'https://test.openml.org/api/v1'
+oml.config.apikey = api_key
 
 
 #get url
@@ -30,37 +34,26 @@ def downloadDataset(id):
     url = getUrl(json.loads(response.text))
     open('temp.arff', 'wb').write(requests.get(url).content)
 
-def extractFeatures(id):
+def extractMetafeatures(id):
     #extract features
-    dsd = dt.get_dataset(id) # dataset discription
-    default_target = dsd.default_target_attribute
-    X,y,categorical_indicator,attribute_names = dsd.get_data(target=default_target)
-    features = []
+    dsd = oml.datasets.get_dataset(id) # dataset discription
+    default_target = dsd.default_target_attribute # get target attribute
+    X,y,categorical_indicator,attribute_names = dsd.get_data(target=default_target, dataset_format='array')
     try:
-        for name, attribute in X.iteritems(): 
-            feature = {}
-            att_index = X.columns.get_loc(name)
-            feature["Index"] = index
-            feature["Name"] = name
-            if index in dsd.get_features_by_type('nominal') :
-                 feature["data_type"] = "nominal"
-            elif index in dsd.get_features_by_type('numeric') :
-                feature["data_type"] = "numeric" 
-            elif index in dsd.get_features_by_type('date') :
-                feature["data_type"] = "date" 
-            elif index in dsd.get_features_by_type('string') :
-                feature["data_type"] = "string" 
-            else:
-                feature["data_type"] = "unknown" 
+        mfe = MFE(groups="all")
+        mfe.fit(X, y)
+        ft = mfe.extract(out_type=pd.DataFrame, suppress_warnings=True)
+        qualities = convert(ft.to_dict('index')[0])
+        return qualities
     except:
-        print("Error")
-    #extract properties
-    d_X = X.to_numpy()
-    d_y = y.to_numpy()
-    mfe = MFE(groups="all")
-    mfe.fit(d_X, d_y)
-    ft = mfe.extract()
-    #return ft?
+        print("Error in extract feartures")
+
+def convert(qualities):
+    try:
+        qualitiesXML = dicttoxml(qualities)
+        print(qualitiesXML)
+    except:
+        print("error in convert")
 
 def uploadDataset():
     return
@@ -68,9 +61,11 @@ def uploadDataset():
 def processDatasets():
     dataids = getDataIds()
     for id in dataids:
-        downloadDataset(id)
+        #downloadDataset(id)
         #process arff file using PyMFE
-        uploadDataset()
-        os.remove('temp.arff')
+        extractMetafeatures(id)
+        #uploadDataset()
+        #os.remove('temp.arff')
 
 
+processDatasets()
