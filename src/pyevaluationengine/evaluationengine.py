@@ -14,6 +14,7 @@ class EvaluationEngine:
     def __init__(self, url=config.defaults["url"], apikey=config.defaults["apikey"]):
         self.url = url
         self.apikey = apikey
+        self.evaluation_engine_id = 1 # will be changed later
 
     # Get IDs of unprocessed datasets
     def get_data_ids(self):
@@ -32,8 +33,30 @@ class EvaluationEngine:
         url = json.loads(response.text)['data_set_description']['url']
         open('temp.arff', 'wb').write(requests.get(url).content)
 
-    def calculate_metafeatures(dsd):
-        
+    def calculate_metafeatures(dsd, default_target, data_id):
+        X,y,categorical_indicator,attribute_names = dsd.get_data(target=default_target, dataset_format='array')
+        mfe = MFE(groups="all")
+        mfe.fit(X, y)   
+        ft = mfe.extract(suppress_warnings=True)
+        qualities = to_xml_format(ft, data_id)
+        return qualities
+    
+    def to_xml_format(ft, data_id)
+        xml  = OrderedDict()
+        xml["oml:data_qualities"] = OrderedDict()
+        xml["oml:data_qualities"]["@xmlns:oml"] = "http://openml.org/openml"
+        xml["oml:data_qualities"]["oml:did"] = data_id
+        xml["oml:data_qualities"]["oml:evaluation_engine_id"] = 1 
+        xml["oml:data_qualities"]["oml:quality"] = []
+        for name, value, index in zip(ft[0], ft[1], range(len(ft[0]))):
+            quality = OrderedDict()
+            quality["oml:name"] = name
+            quality["oml:feature_index"] = index
+            if not math.isnan(value) and not math.isinf(value):
+                quality["oml:value"] = value
+            xml["oml:data_qualities"]["oml:quality"].append(quality) 
+        xmltodict.unparse(xml)
+
     # Upload dataset
     def upload_dataset(self):
         return

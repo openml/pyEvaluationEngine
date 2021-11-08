@@ -67,7 +67,7 @@ def convert(ft):
             if not math.isnan(value) and not math.isinf(value):
                 quality["oml:value"] = value
             xml["oml:data_qualities"]["oml:quality"].append(quality) 
-        print(xmltodict.unparse(xml))
+        xmltodict.unparse(xml)
     except:
         print("error in convert")
 
