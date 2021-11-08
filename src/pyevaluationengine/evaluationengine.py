@@ -2,7 +2,11 @@ import json
 import logging
 import os
 import sys
+import math
 import openml as oml
+from pymfe.mfe import MFE
+from collections import OrderedDict
+import xmltodict
 import requests
 
 from pyevaluationengine import config
@@ -15,6 +19,8 @@ class EvaluationEngine:
         self.url = url
         self.apikey = apikey
         self.evaluation_engine_id = 1 # will be changed later
+        oml.config.server = url
+        oml.config.apikey = apikey
 
     # Get IDs of unprocessed datasets
     def get_data_ids(self):
@@ -29,24 +35,25 @@ class EvaluationEngine:
 
     # Downloads dataset and store as temp.arff
     def download_dataset(self, data_id):
-        response = requests.get(self.url + "/data/"+data_id, params={'api_key': self.apikey})
-        url = json.loads(response.text)['data_set_description']['url']
-        open('temp.arff', 'wb').write(requests.get(url).content)
-
-    def calculate_metafeatures(dsd, default_target, data_id):
+        dsd = oml.datasets.get_dataset(data_id) # dataset discription
+        default_target = dsd.default_target_attribute # get target attribute
         X,y,categorical_indicator,attribute_names = dsd.get_data(target=default_target, dataset_format='array')
+        return X, y
+
+
+    def calculate_data_qualities(self, X, y, data_id):
         mfe = MFE(groups="all")
         mfe.fit(X, y)   
         ft = mfe.extract(suppress_warnings=True)
         qualities = to_xml_format(ft, data_id)
         return qualities
     
-    def to_xml_format(ft, data_id)
+    def to_xml_format(self, ft, data_id):
         xml  = OrderedDict()
         xml["oml:data_qualities"] = OrderedDict()
         xml["oml:data_qualities"]["@xmlns:oml"] = "http://openml.org/openml"
         xml["oml:data_qualities"]["oml:did"] = data_id
-        xml["oml:data_qualities"]["oml:evaluation_engine_id"] = 1 
+        xml["oml:data_qualities"]["oml:evaluation_engine_id"] = self.evaluation_engine_id
         xml["oml:data_qualities"]["oml:quality"] = []
         for name, value, index in zip(ft[0], ft[1], range(len(ft[0]))):
             quality = OrderedDict()
@@ -55,7 +62,7 @@ class EvaluationEngine:
             if not math.isnan(value) and not math.isinf(value):
                 quality["oml:value"] = value
             xml["oml:data_qualities"]["oml:quality"].append(quality) 
-        xmltodict.unparse(xml)
+        return xmltodict.unparse(xml)
 
     # Upload dataset
     def upload_dataset(self):
@@ -66,10 +73,9 @@ class EvaluationEngine:
         data_ids = self.get_data_ids()
 
         for data_id in data_ids:
-            self.download_dataset(data_id)
-
+            X, y = self.download_dataset(data_id)
+            data_qualities = self.calculate_data_qualities(X, y, data_id)
             self.upload_dataset()
-            os.remove('temp.arff')
 
 
 def setup_logging(loglevel):
