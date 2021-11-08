@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import sys
-
+import openml as oml
 import requests
 
 from pyevaluationengine import config
@@ -32,6 +32,8 @@ class EvaluationEngine:
         url = json.loads(response.text)['data_set_description']['url']
         open('temp.arff', 'wb').write(requests.get(url).content)
 
+    def calculate_metafeatures(dsd):
+        
     # Upload dataset
     def upload_dataset(self):
         return
