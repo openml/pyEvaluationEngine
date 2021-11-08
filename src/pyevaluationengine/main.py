@@ -9,6 +9,7 @@ import os
 from dicttoxml import dicttoxml
 from collections import OrderedDict
 import xmltodict
+import math
 
 
 api_key = "07ba2f75d031ff6997b8f93d466f1f1e"
@@ -59,10 +60,12 @@ def convert(ft):
         xml["oml:data_qualities"]["oml:did"] = 0
         xml["oml:data_qualities"]["oml:evaluation_engine_id"] = 0
         xml["oml:data_qualities"]["oml:quality"] = []
-        for name, value in zip(ft[0], ft[1]):
+        for name, value, index in zip(ft[0], ft[1], range(len(ft[0]))):
             quality = OrderedDict()
             quality["oml:name"] = name
-            quality["oml:value"] = value
+            quality["oml:feature_index"] = index
+            if not math.isnan(value) and not math.isinf(value):
+                quality["oml:value"] = value
             xml["oml:data_qualities"]["oml:quality"].append(quality) 
         print(xmltodict.unparse(xml))
     except:
