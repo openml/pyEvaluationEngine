@@ -52,6 +52,8 @@ def convert(qualities):
     try:
         qualitiesXML = dicttoxml(qualities)
         print(qualitiesXML)
+        dom = parseString(qualitiesXML)
+        print(dom.toprettyxml())
     except:
         print("error in convert")
 
