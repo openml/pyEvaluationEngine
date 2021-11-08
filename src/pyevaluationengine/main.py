@@ -7,6 +7,9 @@ import requests
 import json
 import os
 from dicttoxml import dicttoxml
+from collections import OrderedDict
+import xmltodict
+
 
 api_key = "07ba2f75d031ff6997b8f93d466f1f1e"
 
@@ -41,17 +44,27 @@ def extractMetafeatures(id):
     X,y,categorical_indicator,attribute_names = dsd.get_data(target=default_target, dataset_format='array')
     try:
         mfe = MFE(groups="all")
-        mfe.fit(X, y)
-        ft = mfe.extract(out_type=pd.DataFrame, suppress_warnings=True)
-        qualities = convert(ft.to_dict('index')[0])
+        mfe.fit(X, y)   
+        ft = mfe.extract(suppress_warnings=True)
+        qualities = convert(ft)
         return qualities
     except:
         print("Error in extract feartures")
 
-def convert(qualities):
+def convert(ft):
     try:
-        qualitiesXML = dicttoxml(qualities)
-        print(qualitiesXML)
+        xml  = OrderedDict()
+        xml["oml:data_qualities"] = OrderedDict()
+        xml["oml:data_qualities"]["@xmlns:oml"] = "http://openml.org/openml"
+        xml["oml:data_qualities"]["oml:did"] = 0
+        xml["oml:data_qualities"]["oml:evaluation_engine_id"] = 0
+        xml["oml:data_qualities"]["oml:quality"] = []
+        for name, value in zip(ft[0], ft[1]):
+            quality = OrderedDict()
+            quality["oml:name"] = name
+            quality["oml:value"] = value
+            xml["oml:data_qualities"]["oml:quality"].append(quality) 
+        print(xmltodict.unparse(xml))
     except:
         print("error in convert")
 
