@@ -6,3 +6,6 @@ tox
 setuptools
 setuptools_scm
 wheel
+openml
+pymfe
+xmltodict

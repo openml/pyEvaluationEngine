@@ -2,7 +2,11 @@ import json
 import logging
 import os
 import sys
-
+import math
+import openml as oml
+from pymfe.mfe import MFE
+from collections import OrderedDict
+import xmltodict
 import requests
 
 from pyevaluationengine import config
@@ -14,9 +18,12 @@ class EvaluationEngine:
     def __init__(self, url=config.defaults["url"], apikey=config.defaults["apikey"]):
         self.url = url
         self.apikey = apikey
+        self.evaluation_engine_id = 1 # will be changed later
+        oml.config.server = url
+        oml.config.apikey = apikey
 
-    # Get IDs of unprocessed datasets
-    def get_data_ids(self):
+    # Get unprocessed IDs of unprocessed datasets
+    def get_unprocessed_data_ids(self):
         _logger.info("Fetching ID of unprocessed datasets")
         response = requests.get(self.url + "/data/unprocessed/0/normal", params={'api_key': self.apikey})
         datasets = json.loads(response.text)
@@ -28,9 +35,34 @@ class EvaluationEngine:
 
     # Downloads dataset and store as temp.arff
     def download_dataset(self, data_id):
-        response = requests.get(self.url + "/data/"+data_id, params={'api_key': self.apikey})
-        url = json.loads(response.text)['data_set_description']['url']
-        open('temp.arff', 'wb').write(requests.get(url).content)
+        dsd = oml.datasets.get_dataset(data_id) # dataset discription
+        default_target = dsd.default_target_attribute # get target attribute
+        X,y,categorical_indicator,attribute_names = dsd.get_data(target=default_target, dataset_format='array')
+        return X, y
+
+
+    def calculate_data_qualities(self, X, y, data_id):
+        mfe = MFE(groups="all")
+        mfe.fit(X, y)   
+        ft = mfe.extract(suppress_warnings=True)
+        qualities = to_xml_format(ft, data_id)
+        return qualities
+    
+    def to_xml_format(self, ft, data_id):
+        xml  = OrderedDict()
+        xml["oml:data_qualities"] = OrderedDict()
+        xml["oml:data_qualities"]["@xmlns:oml"] = "http://openml.org/openml"
+        xml["oml:data_qualities"]["oml:did"] = data_id
+        xml["oml:data_qualities"]["oml:evaluation_engine_id"] = self.evaluation_engine_id
+        xml["oml:data_qualities"]["oml:quality"] = []
+        for name, value, index in zip(ft[0], ft[1], range(len(ft[0]))):
+            quality = OrderedDict()
+            quality["oml:name"] = name
+            quality["oml:feature_index"] = index
+            if not math.isnan(value) and not math.isinf(value):
+                quality["oml:value"] = value
+            xml["oml:data_qualities"]["oml:quality"].append(quality) 
+        return xmltodict.unparse(xml)
 
     # Upload dataset
     def upload_dataset(self):
@@ -38,13 +70,12 @@ class EvaluationEngine:
 
     # Process dataset
     def process_datasets(self):
-        data_ids = self.get_data_ids()
+        data_ids = self.get_unprocessed_data_ids()
 
         for data_id in data_ids:
-            self.download_dataset(data_id)
-
+            X, y = self.download_dataset(data_id)
+            data_qualities = self.calculate_data_qualities(X, y, data_id)
             self.upload_dataset()
-            os.remove('temp.arff')
 
 
 def setup_logging(loglevel):
@@ -59,7 +90,7 @@ def main():
 
     engine = EvaluationEngine(config.testing['url'], config.testing['apikey'])
 
-    EvaluationEngine.get_data_ids(engine)
+    EvaluationEngine.get_unprocessed_data_ids(engine)
 
 
 if __name__ == "__main__":
