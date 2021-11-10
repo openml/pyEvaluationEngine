@@ -22,8 +22,8 @@ class EvaluationEngine:
         oml.config.server = url
         oml.config.apikey = apikey
 
-    # Get IDs of unprocessed datasets
-    def get_data_ids(self):
+    # Get unprocessed IDs of unprocessed datasets
+    def get_unprocessed_data_ids(self):
         _logger.info("Fetching ID of unprocessed datasets")
         response = requests.get(self.url + "/data/unprocessed/0/normal", params={'api_key': self.apikey})
         datasets = json.loads(response.text)
@@ -70,7 +70,7 @@ class EvaluationEngine:
 
     # Process dataset
     def process_datasets(self):
-        data_ids = self.get_data_ids()
+        data_ids = self.get_unprocessed_data_ids()
 
         for data_id in data_ids:
             X, y = self.download_dataset(data_id)
@@ -90,7 +90,7 @@ def main():
 
     engine = EvaluationEngine(config.testing['url'], config.testing['apikey'])
 
-    EvaluationEngine.get_data_ids(engine)
+    EvaluationEngine.get_unprocessed_data_ids(engine)
 
 
 if __name__ == "__main__":
