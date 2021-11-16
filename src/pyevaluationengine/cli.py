@@ -1,11 +1,11 @@
 import argparse
 import logging
 import sys
-
+import evaluationengine
 
 from pyevaluationengine.evaluationengine import EvaluationEngine
 
-from .__version__ import __version__
+from __version__ import __version__ #orgineel (.__version__ import ...) weet niet de reden voor die punt dus heb hem weg gehaald, comment voor het geval dat het dit iets sloopt
 
 __author__ = "LUDev"
 __copyright__ = "LUDev"
@@ -35,6 +35,15 @@ def parse_args(args):
         action="store_const",
         const=logging.DEBUG,
     )
+    parser.add_argument( #hier mee kun je evaluationengine.py x aantal keer aanroepen
+        "-t",
+        "-times",
+        type=int,
+        default=1,
+        help="amount of times the evaluation engine is run",
+
+    )
+
     return parser.parse_args(args)
 
 
@@ -55,3 +64,8 @@ def run():
 
 if __name__ == "__main__":
     run()
+    amount_of_repeats=(parse_args(sys.argv[1:]).t)
+    i=0
+    while amount_of_repeats > i:
+        evaluationengine.main()
+        i+=1
