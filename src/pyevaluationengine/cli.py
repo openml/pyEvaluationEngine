@@ -39,7 +39,7 @@ def parse_args(args):
         "-t",
         "-times",
         type=int,
-        default=1,
+        default=0,
         help="amount of times the evaluation engine is run",
 
     )
