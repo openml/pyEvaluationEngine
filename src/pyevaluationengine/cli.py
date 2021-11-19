@@ -65,7 +65,10 @@ def run():
 if __name__ == "__main__":
     run()
     amount_of_repeats=(parse_args(sys.argv[1:]).t)
-    i=0
-    while amount_of_repeats > i:
-        evaluationengine.main()
-        i+=1
+    if amount_of_repeats > 0: #voert t=x keer eveluationengine.py uit kijk of dit correct is met wat script 2 zou moetten doen
+        i=0
+        while amount_of_repeats > i:
+            i+=1
+            _logger.info("executing main function for the "+str(i)+"th time")
+            evaluationengine.main()
+            
