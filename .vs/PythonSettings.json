@@ -1,5 +1,5 @@
 {
   "TestFramework": "Pytest",
   "SuppressEnvironmentCreationPrompt": true,
-  "Interpreter": "Workspace|Workspace|.venv"
+  "Interpreter": "Global|PythonCore|3.9"
 }

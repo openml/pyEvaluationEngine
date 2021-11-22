@@ -42,12 +42,9 @@ class EvaluationEngine:
 
 
     def calculate_data_qualities(self, X, y):
-        try: 
-            mfe = MFE(groups="all")
-            mfe.fit(X, y)   
-            qualities = mfe.extract(suppress_warnings=True)
-        except:
-            qualities = ([],[])
+        mfe = MFE(groups="all")
+        mfe.fit(X, y)   
+        qualities = mfe.extract(suppress_warnings=True)
         return qualities
     
     def to_xml_format(self, ft, data_id):
@@ -67,8 +64,10 @@ class EvaluationEngine:
         return xmltodict.unparse(xml)
 
     # Upload dataset
-    def upload_dataset(self):
-        return
+    def upload_dataset(self, xmldata):
+        _logger.info("Uploading qualities")
+        response = requests.post(self.url + "/data/qualities", params={'api_key': self.apikey}, data=xmldata)
+        _logger.debug(f'Response: {response.text}')
 
     # Process dataset
     def process_datasets(self):
@@ -76,9 +75,9 @@ class EvaluationEngine:
 
         for data_id in data_ids:
             X, y = self.download_dataset(data_id)
-            xmldata = self.calculate_data_qualities(X, y)
-            qualities = self.to_xml_format(xmldata, data_id)
-            self.upload_dataset()
+            data_qualities = self.calculate_data_qualities(X, y)
+            xmldata = self.to_xml_format(data_qualities,data_id)
+            self.upload_dataset(xmldata)
 
 
 def setup_logging(loglevel):

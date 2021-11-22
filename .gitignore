@@ -52,3 +52,5 @@ MANIFEST
 .venv*/
 .conda*/
 /.vs/2021-01-pyEvaluationEngine/v16/Browse.VC.opendb
+/tests/test_sets/iq_brain_size (1).arff
+/tests/test_sets/GDP India.arff
