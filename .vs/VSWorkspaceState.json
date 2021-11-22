@@ -2,11 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\pyevaluationengine",
-    "\\src\\pyevaluationengine\\pyevaluationengine",
-    "\\tests",
     "\\tests\\test_sets"
   ],
-  "SelectedNode": "\\tests\\test_evaluationengine.py",
+  "SelectedNode": "\\tests",
   "PreviewInSolutionExplorer": false
 }
