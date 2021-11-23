@@ -1,3 +1,4 @@
+from configparser import Error
 import json
 import logging
 import os
@@ -8,14 +9,15 @@ from pymfe.mfe import MFE
 from collections import OrderedDict
 import xmltodict
 import requests
+from xml.etree import ElementTree
 
-from pyevaluationengine import config
+from config import defaults, testing
 
 _logger = logging.getLogger(__name__)
 
 
 class EvaluationEngine:
-    def __init__(self, url=config.defaults["url"], apikey=config.defaults["apikey"]):
+    def __init__(self, url=defaults["url"], apikey=defaults["apikey"]):
         self.url = url
         self.apikey = apikey
         self.evaluation_engine_id = 1 # will be changed later
@@ -23,24 +25,38 @@ class EvaluationEngine:
         oml.config.apikey = apikey
 
     # Get unprocessed IDs of unprocessed datasets
-    def get_unprocessed_data_ids(self):
-        _logger.info("Fetching ID of unprocessed datasets")
-        response = requests.get(self.url + "/data/unprocessed/0/normal", params={'api_key': self.apikey})
+    def get_unprocessed_dataset_ids(self):
+        _logger.info("Fetching IDs of unprocessed datasets")
+
+        # Send request to OpenML server
+        response = requests.get(self.url + "/json/data/unprocessed/0/normal", params={'api_key': self.apikey})
+        if response.status_code != 200:
+            _logger.error('Could not fetch the IDs of unprocessed datasets')
+            return []
+
+        # Parse requests
         datasets = json.loads(response.text)
         data_ids = []
         for key in datasets['data_unprocessed']:
             data_ids.append(datasets['data_unprocessed'][key]['did'])
-            _logger.debug(f'Found unprocessed dataset: {data_ids[-1]}')
+        
+        # Logging
+        if not data_ids:
+            _logger.info('No unprocessed datasets found')
+        else:
+            _logger.debug(f'Unprocessed datasets found: {data_ids}')
+        
         return data_ids
 
-    # Downloads dataset and store as temp.arff
+    # Downloads a dataset to OpenML cache
     def download_dataset(self, data_id):
-        dsd = oml.datasets.get_dataset(data_id) # dataset discription
-        default_target = dsd.default_target_attribute # get target attribute
-        X,y,categorical_indicator,attribute_names = dsd.get_data(target=default_target, dataset_format='array')
-        return X, y
+        _logger.info(f'Fetching dataset {data_id}')
+        try:
+            oml.datasets.get_dataset(data_id)
+        except:
+            _logger.error(f'Error while fetching dataset {data_id}')
 
-
+    # Calculate all necessary qualities
     def calculate_data_qualities(self, X, y):
         try: 
             mfe = MFE(groups="all")
@@ -74,7 +90,7 @@ class EvaluationEngine:
 
     # Process dataset
     def process_datasets(self):
-        data_ids = self.get_unprocessed_data_ids()
+        data_ids = self.get_unprocessed_dataset_ids()
 
         for data_id in data_ids:
             X, y = self.download_dataset(data_id)
@@ -93,9 +109,13 @@ def setup_logging(loglevel):
 def main():
     setup_logging(logging.DEBUG)
 
-    engine = EvaluationEngine(config.testing['url'], config.testing['apikey'])
+    engine = EvaluationEngine(testing['url'], testing['apikey'])
 
-    EvaluationEngine.process_datasets(engine)
+    # engine.get_unprocessed_dataset_ids()
+    engine.download_dataset(1)
+    
+
+
 
 
 if __name__ == "__main__":
