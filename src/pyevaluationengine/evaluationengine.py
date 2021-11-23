@@ -65,8 +65,10 @@ class EvaluationEngine:
         return xmltodict.unparse(xml)
 
     # Upload dataset
-    def upload_dataset(self):
-        return
+    def upload_dataset(self, xmldata):
+        _logger.info("Uploading qualities")
+        response = requests.post(self.url + "/data/qualities", params={'api_key': self.apikey}, data=xmldata)
+        _logger.debug(f'Response: {response.text}')
 
     # Process dataset
     def process_datasets(self):
@@ -75,7 +77,7 @@ class EvaluationEngine:
         for data_id in data_ids:
             X, y = self.download_dataset(data_id)
             data_qualities = self.calculate_data_qualities(X, y, data_id)
-            self.upload_dataset()
+            self.upload_dataset(data_qualities)
 
 
 def setup_logging(loglevel):
@@ -90,7 +92,7 @@ def main():
 
     engine = EvaluationEngine(config.testing['url'], config.testing['apikey'])
 
-    EvaluationEngine.get_unprocessed_data_ids(engine)
+    EvaluationEngine.process_datasets(engine)
 
 
 if __name__ == "__main__":
