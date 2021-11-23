@@ -41,11 +41,13 @@ class EvaluationEngine:
         return X, y
 
 
-    def calculate_data_qualities(self, X, y, data_id):
-        mfe = MFE(groups="all")
-        mfe.fit(X, y)   
-        ft = mfe.extract(suppress_warnings=True)
-        qualities = to_xml_format(ft, data_id)
+    def calculate_data_qualities(self, X, y):
+        try: 
+            mfe = MFE(groups="all")
+            mfe.fit(X, y)   
+            qualities = mfe.extract(suppress_warnings=True)
+        except:
+            qualities = ([],[])
         return qualities
     
     def to_xml_format(self, ft, data_id):
@@ -76,8 +78,9 @@ class EvaluationEngine:
 
         for data_id in data_ids:
             X, y = self.download_dataset(data_id)
-            data_qualities = self.calculate_data_qualities(X, y, data_id)
-            self.upload_dataset(data_qualities)
+            xmldata = self.calculate_data_qualities(X, y)
+            qualities = self.to_xml_format(xmldata, data_id)
+            self.upload_dataset()
 
 
 def setup_logging(loglevel):
