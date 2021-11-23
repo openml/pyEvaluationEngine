@@ -1,7 +1,5 @@
-from configparser import Error
 import json
 import logging
-import os
 import sys
 import math
 import openml as oml
@@ -9,10 +7,9 @@ from pymfe.mfe import MFE
 from collections import OrderedDict
 import xmltodict
 import requests
-from xml.etree import ElementTree
 import arff
 
-from config import defaults, testing
+from pyevaluationengine.config import defaults, testing
 
 _logger = logging.getLogger(__name__)
 
@@ -39,7 +36,7 @@ class EvaluationEngine:
         datasets = json.loads(response.text)
         data_ids = []
         for key in datasets['data_unprocessed']:
-            data_ids.append(datasets['data_unprocessed'][key]['did'])
+            data_ids.append(int(datasets['data_unprocessed'][key]['did']))
         
         # Logging
         if not data_ids:
@@ -49,60 +46,58 @@ class EvaluationEngine:
         
         return data_ids
 
-    # Downloads a dataset to OpenML cache
-    def download_dataset(self, data_id):
+    # Downloads a dataset to OpenML cache and returns the ARFF dataset
+    def download_dataset(self, data_id: int):
         _logger.info(f'Fetching dataset {data_id}')
         try:
-            oml.datasets.get_dataset(data_id)
+            return arff.load(open(oml.datasets.get_dataset(data_id).data_file))
         except:
             _logger.error(f'Error while fetching dataset {data_id}')
 
-    # Calculate all necessary qualities
-    def calculate_data_qualities(self, data_id):
-        # First fetch the dataset and prepare columns
-        _logger.info(f'Fetching dataset {data_id}')
-        try:
-            dataset = oml.datasets.get_dataset(data_id)
-        except:
-            _logger.error(f'Error while fetching dataset {data_id}')
-
-        dataset_arff = arff.load(open(dataset.data_file))
+    # Calculate all necessary qualities and return the qualities
+    def calculate_data_qualities(self, dataset_arff, data_id):
         x = dataset_arff['data']
         y = []
         for attribute in dataset_arff['attributes']:
             y.append(attribute[0])
 
         # Calculate all qualities using MFE
-        _logger.info(f'Calculating features of dataset {data_id}')
+        _logger.info(f'Calculating qualities of dataset {data_id}')
         try: 
             mfe = MFE(groups="all")
             mfe.fit(x, features=y)
-            metafeatures = mfe.extract(suppress_warnings=True)
-            # _logger.debug("\n".join("{:50} {:30}".format(x, y) for x, y in zip(metafeatures[0], metafeatures[1])))
+            qualities = mfe.extract(suppress_warnings=True)
+            # _logger.debug("\n".join("{:50} {:30}".format(x, y) for x, y in zip(qualities[0], qualities[1])))
+
+            # TODO: Add scikit-learn processing
+
         except:
-            _logger.error(f'Error while calculating features of dataset {data_id}')
+            _logger.error(f'Error while calculating qualities of dataset {data_id}')
             return []
 
-        return metafeatures
+        return qualities
     
-    def to_xml_format(self, ft, data_id):
+    # Convert the qualities of a dateset to the correct xml format
+    def qualities_to_xml_format(self, qualities, data_id: int):
         xml  = OrderedDict()
         xml["oml:data_qualities"] = OrderedDict()
         xml["oml:data_qualities"]["@xmlns:oml"] = "http://openml.org/openml"
         xml["oml:data_qualities"]["oml:did"] = data_id
         xml["oml:data_qualities"]["oml:evaluation_engine_id"] = self.evaluation_engine_id
         xml["oml:data_qualities"]["oml:quality"] = []
-        for name, value, index in zip(ft[0], ft[1], range(len(ft[0]))):
+
+        for name, value, index in zip(qualities[0], qualities[1], range(len(qualities[0]))):
             quality = OrderedDict()
             quality["oml:name"] = name
             quality["oml:feature_index"] = index
             if not math.isnan(value) and not math.isinf(value):
                 quality["oml:value"] = value
             xml["oml:data_qualities"]["oml:quality"].append(quality) 
+        
         return xmltodict.unparse(xml)
 
-    # Upload dataset
-    def upload_dataset(self, xmldata):
+    # Upload the qualities of the given dataset
+    def upload_qualities(self, xmldata):
         _logger.info("Uploading qualities")
         response = requests.post(self.url + "/data/qualities", params={'api_key': self.apikey}, data=xmldata)
         _logger.debug(f'Response: {response.text}')
@@ -112,10 +107,10 @@ class EvaluationEngine:
         data_ids = self.get_unprocessed_dataset_ids()
 
         for data_id in data_ids:
-            X, y = self.download_dataset(data_id)
-            xmldata = self.calculate_data_qualities(X, y)
-            qualities = self.to_xml_format(xmldata, data_id)
-            self.upload_dataset()
+            dataset = self.download_dataset(data_id)
+            qualities = self.calculate_data_qualities(dataset)
+            qualities_xml = self.qualities_to_xml_format(qualities, data_id)
+            self.upload_qualities(qualities_xml)
 
 
 def setup_logging(loglevel):
@@ -129,13 +124,8 @@ def main():
     setup_logging(logging.DEBUG)
 
     engine = EvaluationEngine(testing['url'], testing['apikey'])
-
-    # engine.get_unprocessed_dataset_ids()
-    engine.calculate_data_qualities(1)
+    engine.process_datasets()
     
-
-
-
 
 if __name__ == "__main__":
     main()
