@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+import time
 
 from requests.models import Response
 import evaluationengine
@@ -42,8 +43,8 @@ def parse_args(args):
         const=logging.DEBUG,
     )
     parser.add_argument( #hier mee kun je evaluationengine.py x aantal keer aanroepen
-        "-t",
-        "-times",
+        "-n",
+        "-number",
         type=int,
         default=0,
         help="set amount of times the evaluation engine is run",
@@ -61,6 +62,13 @@ def parse_args(args):
         type=int,
         default=0,
         help="procces all unprocesed data if its value is higher than 0",
+    )
+    parser.add_argument( 
+        "-t",
+        "-time",
+        type=int,
+        default=30,
+        help="amount of time to wait for new datasets, standart is 30",
     )
     return parser.parse_args(args)
 
@@ -80,25 +88,43 @@ def main(args):
 def run():
     main(sys.argv[1:])
 
-def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["apikey"]):
-    response=requests.get(config.testing["url"]+"/data/unprocessed/0/normal", params={"api_key":config.testing["apikey"]})
+def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["apikey"]): #hier moet nog wat met de inputs gedaan worden
+    response=requests.get(url+"/data/unprocessed/0/normal", params={"api_key":apikey})
     data=json.loads(response.text)
-    datasets=[]
     print("the following datasets are unprocessed")
     for i in data["data_unprocessed"]:
         print(data["data_unprocessed"][i]["name"])
+    
+def process_all(url=config.defaults["url"],apikey=config.defaults["apikey"],sleeptime=30):
+    def fetch_data(url,apikey):
+        response=requests.get(url+"/data/unprocessed/0/normal", params={"api_key":apikey})
+        data=json.loads(response.text)
+        return data
+    data=fetch_data(url,apikey)
+    datasets=0
+    for i in data["data_unprocessed"]:
+        datasets=+1
+    i=0
+    while i<datasets:
+        i=+1
+        _logger.info("executing main function for the "+str(i)+"th time")
+        evaluationengine.main()
+    time.sleep(sleeptime) #er moet hierna nog gecontroleerd worden op nieuwe datasets
+    
 
 if __name__ == "__main__":
     run()
-    amount_of_repeats=(parse_args(sys.argv[1:]).t)
+    amount_of_repeats=(parse_args(sys.argv[1:]).n)
     print_unproccesed=(parse_args(sys.argv[1:]).p)
     process=(parse_args(sys.argv[1:]).a)
+    sleeptime=(parse_args(sys.argv[1:]).t)
     if amount_of_repeats > 0: #voert t=x keer eveluationengine.py uit kijk of dit correct is met wat script 2 zou moetten doen
         i=0
         while amount_of_repeats > i:
             i+=1
             _logger.info("executing main function for the "+str(i)+"th time")
             evaluationengine.main()
-    if print_unproccesed>0:
-        print_unproccesed_data()
-
+    if print_unproccesed>0: #print lijst van unprocesd datasets
+        print_unproccesed_data(config.testing["url"],config.testing["apikey"])
+    if process>0: #process alle datasets
+        process_all(config.testing["url"],config.testing["apikey"],sleeptime)
