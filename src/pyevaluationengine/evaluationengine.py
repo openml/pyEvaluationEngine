@@ -10,6 +10,7 @@ from collections import OrderedDict
 import xmltodict
 import requests
 from xml.etree import ElementTree
+import arff
 
 from config import defaults, testing
 
@@ -57,14 +58,32 @@ class EvaluationEngine:
             _logger.error(f'Error while fetching dataset {data_id}')
 
     # Calculate all necessary qualities
-    def calculate_data_qualities(self, X, y):
+    def calculate_data_qualities(self, data_id):
+        # First fetch the dataset and prepare columns
+        _logger.info(f'Fetching dataset {data_id}')
+        try:
+            dataset = oml.datasets.get_dataset(data_id)
+        except:
+            _logger.error(f'Error while fetching dataset {data_id}')
+
+        dataset_arff = arff.load(open(dataset.data_file))
+        x = dataset_arff['data']
+        y = []
+        for attribute in dataset_arff['attributes']:
+            y.append(attribute[0])
+
+        # Calculate all qualities using MFE
+        _logger.info(f'Calculating features of dataset {data_id}')
         try: 
             mfe = MFE(groups="all")
-            mfe.fit(X, y)   
-            qualities = mfe.extract(suppress_warnings=True)
+            mfe.fit(x, features=y)
+            metafeatures = mfe.extract(suppress_warnings=True)
+            # _logger.debug("\n".join("{:50} {:30}".format(x, y) for x, y in zip(metafeatures[0], metafeatures[1])))
         except:
-            qualities = ([],[])
-        return qualities
+            _logger.error(f'Error while calculating features of dataset {data_id}')
+            return []
+
+        return metafeatures
     
     def to_xml_format(self, ft, data_id):
         xml  = OrderedDict()
@@ -112,7 +131,7 @@ def main():
     engine = EvaluationEngine(testing['url'], testing['apikey'])
 
     # engine.get_unprocessed_dataset_ids()
-    engine.download_dataset(1)
+    engine.calculate_data_qualities(1)
     
 
 
