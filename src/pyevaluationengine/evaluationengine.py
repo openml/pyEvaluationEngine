@@ -65,9 +65,6 @@ class EvaluationEngine:
             mfe.fit(x)
             qualities = mfe.extract(suppress_warnings=True)
             _logger.debug("\n".join("{:50} {:30}".format(x, y) for x, y in zip(qualities[0], qualities[1])))
-
-            # TODO: Add scikit-learn processing
-
         except:
             _logger.error(f'Error while calculating qualities of dataset {data_id}')
             return []
