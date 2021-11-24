@@ -57,17 +57,14 @@ class EvaluationEngine:
     # Calculate all necessary qualities and return the qualities
     def calculate_data_qualities(self, dataset_arff, data_id):
         x = dataset_arff['data']
-        y = []
-        for attribute in dataset_arff['attributes']:
-            y.append(attribute[0])
 
         # Calculate all qualities using MFE
         _logger.info(f'Calculating qualities of dataset {data_id}')
         try: 
             mfe = MFE(groups="all")
-            mfe.fit(x, features=y)
+            mfe.fit(x)
             qualities = mfe.extract(suppress_warnings=True)
-            # _logger.debug("\n".join("{:50} {:30}".format(x, y) for x, y in zip(qualities[0], qualities[1])))
+            _logger.debug("\n".join("{:50} {:30}".format(x, y) for x, y in zip(qualities[0], qualities[1])))
 
             # TODO: Add scikit-learn processing
 
@@ -92,8 +89,11 @@ class EvaluationEngine:
             quality["oml:feature_index"] = index
             if not math.isnan(value) and not math.isinf(value):
                 quality["oml:value"] = value
-            xml["oml:data_qualities"]["oml:quality"].append(quality) 
+            xml["oml:data_qualities"]["oml:quality"].append(quality)
         
+        # TODO: This is not in the correct format yet
+        # Example is not complete: https://www.openml.org/api_docs#!/data/post_data_qualities
+
         return xmltodict.unparse(xml)
 
     # Upload the qualities of the given dataset
@@ -108,7 +108,7 @@ class EvaluationEngine:
 
         for data_id in data_ids:
             dataset = self.download_dataset(data_id)
-            qualities = self.calculate_data_qualities(dataset)
+            qualities = self.calculate_data_qualities(dataset, data_id)
             qualities_xml = self.qualities_to_xml_format(qualities, data_id)
             self.upload_qualities(qualities_xml)
 
