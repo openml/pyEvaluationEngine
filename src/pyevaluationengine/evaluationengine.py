@@ -96,7 +96,7 @@ class EvaluationEngine:
     # Upload the qualities of the given dataset
     def upload_qualities(self, xmldata):
         _logger.info("Uploading qualities")
-        response = requests.post(self.url + "/data/qualities", params={'api_key': self.apikey}, data=xmldata)
+        response = requests.post(self.url + "/data/qualities", params={'api_key': self.apikey}, files={"description": xmldata})
         _logger.debug(f'Response: {response.text}')
 
     # Process dataset
