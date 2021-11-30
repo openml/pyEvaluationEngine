@@ -88,7 +88,7 @@ def main(args):
 def run():
     main(sys.argv[1:])
 
-def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["apikey"]): #hier moet nog wat met de inputs gedaan worden
+def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["apikey"]): 
     response=requests.get(url+"/data/unprocessed/0/normal", params={"api_key":apikey})
     data=json.loads(response.text)
     print("the following datasets are unprocessed")
@@ -117,7 +117,6 @@ if __name__ == "__main__":
     amount_of_repeats=(parse_args(sys.argv[1:]).n)
     print_unproccesed=(parse_args(sys.argv[1:]).p)
     process=(parse_args(sys.argv[1:]).a)
-    sleeptime=(parse_args(sys.argv[1:]).t)
     if amount_of_repeats > 0: #voert t=x keer eveluationengine.py uit kijk of dit correct is met wat script 2 zou moetten doen
         i=0
         while amount_of_repeats > i:
@@ -127,4 +126,5 @@ if __name__ == "__main__":
     if print_unproccesed>0: #print lijst van unprocesd datasets
         print_unproccesed_data(config.testing["url"],config.testing["apikey"])
     if process>0: #process alle datasets
+        sleeptime=(parse_args(sys.argv[1:]).t)
         process_all(config.testing["url"],config.testing["apikey"],sleeptime)
