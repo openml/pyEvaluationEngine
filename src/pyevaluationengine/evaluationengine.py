@@ -77,6 +77,26 @@ class EvaluationEngine:
             data_qualities = self.calculate_data_qualities(X, y, data_id)
             self.upload_dataset()
 
+    # Proces 1 dataset
+    def process_one_dataset(self): #procceses only 1 dataset, dit word momenteel niet herkent in cli.py
+        data_ids =self.get_unprocessed_data_ids() #je haalt alles op maar gebruikt er 1, dit kan optimaler
+        X, y =self.download_dataset(data_ids[0])
+        data_qualities = self.calculate_data_qualities(X, y, data_ids[0])
+        self.upload_dataset()
+
+    #proces 1 specific dataset
+    def process_specefic_dataset(self):
+        wanted_dataset_name=input("Enter dataset name: ")
+        response = requests.get(self.url + "/data/unprocessed/0/normal", params={'api_key': self.apikey})
+        datasets = json.loads(response.text)
+        for dataset in datasets["data_unprocessed"]:
+            print(datasets["data_unprocessed"][dataset])
+            if datasets["data_unprocessed"][dataset]["name"] == wanted_dataset_name: #als dataset met die naam gevonden is
+                X, y =self.download_dataset(datasets["data_unprocessed"][dataset]["did"])
+                data_qualities = self.calculate_data_qualities(X, y, datasets["data_unprocessed"][dataset]["did"])
+                self.upload_dataset()
+                return
+        print("no dataset found with the name "+str(wanted_dataset_name))
 
 def setup_logging(loglevel):
     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
@@ -90,8 +110,9 @@ def main():
 
     engine = EvaluationEngine(config.testing['url'], config.testing['apikey'])
 
+    EvaluationEngine.process_datasets(engine)
     EvaluationEngine.get_unprocessed_data_ids(engine)
-
+    EvaluationEngine.process_specefic_dataset(engine)
 
 if __name__ == "__main__":
     main()

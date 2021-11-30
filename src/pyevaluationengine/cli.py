@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 import time
+#from typing_extensions import runtime
 
 from requests.models import Response
 import evaluationengine
@@ -70,6 +71,13 @@ def parse_args(args):
         default=30,
         help="amount of time to wait for new datasets, standart is 30",
     )
+    parser.add_argument( 
+        "-k",
+        "-keep_processing",
+        type=int,
+        default=0,
+        help="procceses all datasets and then waits for a time and checks if there are more datasets, if there are repeat program inf not stops. runs if it is higher than 0",
+    )
     return parser.parse_args(args)
 
 
@@ -95,36 +103,44 @@ def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["ap
     for i in data["data_unprocessed"]:
         print(data["data_unprocessed"][i]["name"])
     
-def process_all(url=config.defaults["url"],apikey=config.defaults["apikey"],sleeptime=30):
-    def fetch_data(url,apikey):
+def process_all(url=config.defaults["url"],apikey=config.defaults["apikey"]): 
+    engine=EvaluationEngine(url, apikey)
+    engine.process_datasets()
+
+def keep_proccesing_all(url=config.defaults["url"],apikey=config.defaults["apikey"],sleeptime=30):
+    engine=EvaluationEngine(url, apikey)
+    while True:
         response=requests.get(url+"/data/unprocessed/0/normal", params={"api_key":apikey})
         data=json.loads(response.text)
-        return data
-    data=fetch_data(url,apikey)
-    datasets=0
-    for i in data["data_unprocessed"]:
-        datasets=+1
+        if data["data_unprocessed"]=={}:
+            _logger.info("no more unprocessed data sets are left, ending program")
+            break
+        engine.process_datasets() #we kunnen nog niet goed testen omdat we nog niet uploaden
+        time.sleep(sleeptime)
+        _logger.info("sleep of "+str(sleeptime)+" has ended")
+
+def process_x_amount(url=config.defaults["url"],apikey=config.defaults["apikey"],amount_of_repeats=0):
+    engine=EvaluationEngine(url, apikey)
     i=0
-    while i<datasets:
-        i=+1
+    while amount_of_repeats > i:
+        i+=1
         _logger.info("executing main function for the "+str(i)+"th time")
-        evaluationengine.main()
-    time.sleep(sleeptime) #er moet hierna nog gecontroleerd worden op nieuwe datasets
-    
+        engine.process_one_dataset()
+
 
 if __name__ == "__main__":
     run()
     amount_of_repeats=(parse_args(sys.argv[1:]).n)
     print_unproccesed=(parse_args(sys.argv[1:]).p)
     process=(parse_args(sys.argv[1:]).a)
+    keep_prossesing=(parse_args(sys.argv[1:]).k)
     if amount_of_repeats > 0: #voert t=x keer eveluationengine.py uit kijk of dit correct is met wat script 2 zou moetten doen
-        i=0
-        while amount_of_repeats > i:
-            i+=1
-            _logger.info("executing main function for the "+str(i)+"th time")
-            evaluationengine.main()
+        process_x_amount(config.testing["url"],config.testing["apikey"],amount_of_repeats)
     if print_unproccesed>0: #print lijst van unprocesd datasets
         print_unproccesed_data(config.testing["url"],config.testing["apikey"])
     if process>0: #process alle datasets
+        
+        process_all(config.testing["url"],config.testing["apikey"])
+    if keep_prossesing>0:
         sleeptime=(parse_args(sys.argv[1:]).t)
-        process_all(config.testing["url"],config.testing["apikey"],sleeptime)
+        keep_proccesing_all(config.testing["url"],config.testing["apikey"],sleeptime)
