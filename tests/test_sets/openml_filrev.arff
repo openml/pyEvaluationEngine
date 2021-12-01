@@ -1,0 +1,13 @@
+@relation openml_filrev
+
+@attribute text {'capsule : an insult .','a stupid and incompetent movie that doesnt even have the benefit of being trashily enjoyable .','weslely and woody would do well to leave this off their resumes .','money train is one of the worst movies i have ever seen .','its not simply idiotic its contemptuous of its audience .','it tries to make us swallow things that a better movie would be stopped cold by or just plain omit entirely .','its a waste of wesley snipes and woody harrelson who are enjoyable actors in their own rights but are nauseating here .','its not even fun as trash .'}
+
+@data
+'capsule : an insult .'
+'a stupid and incompetent movie that doesnt even have the benefit of being trashily enjoyable .'
+'weslely and woody would do well to leave this off their resumes .'
+'money train is one of the worst movies i have ever seen .'
+'its not simply idiotic its contemptuous of its audience .'
+'it tries to make us swallow things that a better movie would be stopped cold by or just plain omit entirely .'
+'its a waste of wesley snipes and woody harrelson who are enjoyable actors in their own rights but are nauseating here .'
+'its not even fun as trash .'

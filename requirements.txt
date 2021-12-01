@@ -9,3 +9,4 @@ wheel
 openml
 pymfe
 xmltodict
+liac-arff

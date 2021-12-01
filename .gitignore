@@ -51,4 +51,5 @@ MANIFEST
 # Per-project virtualenvs
 .venv*/
 .conda*/
-/.vs/2021-01-pyEvaluationEngine/v16/Browse.VC.opendb
+.vs/
+env*/
