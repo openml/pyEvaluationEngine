@@ -175,7 +175,7 @@ html_theme_options = {
         ("Start", "index"),
         ("Contributing", "contributing"),
         ("Changelog", "progress"),
-        ("API", "api"),
+        ("API", "api/modules"),
     ],
     # Render the next and previous page links in navbar. (Default: true)
     "navbar_sidebarrel": False,
