@@ -32,7 +32,7 @@ pymfe.median.mean,numerical,null,null
 pymfe.median.sd,numerical,null,null
 pymfe.min.mean,numerical,null,null
 pymfe.min.sd,numerical,null,null
-pymfe.nr_attr,numerical,null,null
+pymfe.nr_attr,numerical,0,null
 pymfe.nr_bin,numerical,null,null
 pymfe.nr_cat,numerical,null,null
 pymfe.nr_cor_attr,numerical,null,null
