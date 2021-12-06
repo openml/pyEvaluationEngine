@@ -1,4 +1,4 @@
-attr,numerical/nominal,min,max
+attr,type,min,max
 pymfe.attr_conc.mean,numerical,null,null
 pymfe.attr_conc.sd,numerical,0,null
 pymfe.attr_ent.mean,numerical,null,null
