@@ -4,7 +4,7 @@ pymfe.attr_conc.sd,numerical,0,null
 pymfe.attr_ent.mean,numerical,null,null
 pymfe.attr_ent.sd,numerical,0,null
 pymfe.attr_to_inst,numerical,null,null
-pymfe.cat_to_num,numerical,null,null
+pymfe.cat_to_num,numerical,0,null
 pymfe.cohesiveness.mean,numerical,null,null
 pymfe.cohesiveness.sd,numerical,0,null
 pymfe.cor.mean,numerical,null,null
