@@ -20,7 +20,7 @@ def test_constructor():
 
 
 def test_calculate_data_qualities():
-    #test calculate_data_qualities with dataset 'cload.arff'id = 890
+    #test calculate_data_qualities with dataset 'cload.arff' (id = 890)
     instance = EvaluationEngine()
     list_qualities = []
     path = 'tests/test_sets'
