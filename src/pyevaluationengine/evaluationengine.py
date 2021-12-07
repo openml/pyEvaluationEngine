@@ -159,22 +159,24 @@ class EvaluationEngine:
 
     # Proces 1 dataset
     def process_one_dataset(self): #procceses only 1 dataset, dit word momenteel niet herkent in cli.py
-        data_ids = self.get_unprocessed_dataset_ids() #je haalt alles op maar gebruikt er 1, dit kan optimaler
+        data_ids =self.get_unprocessed_dataset_ids() #je haalt alles op maar gebruikt er 1, dit kan optimaler
         dataset=self.download_dataset(data_ids[0])
         qualities=self.calculate_data_qualities(dataset,data_ids[0])
         qualities_xml=self.qualities_to_xml_format(qualities,data_ids[0])
         self.upload_qualities(qualities_xml)
 
     #proces 1 specific dataset
-    def process_specefic_dataset(self):
+    def process_input_dataset(self):
         wanted_dataset_name=input("Enter dataset name: ")
-        response = requests.get(self.url + "/data/unprocessed/0/normal", params={'api_key': self.apikey})
-        datasets = json.loads(response.text)
-        for dataset in datasets["data_unprocessed"]:
-            print(datasets["data_unprocessed"][dataset])
-            if datasets["data_unprocessed"][dataset]["name"] == wanted_dataset_name: #als dataset met die naam gevonden is
-                X, y =self.download_dataset(datasets["data_unprocessed"][dataset]["did"])
-                data_qualities = self.calculate_data_qualities(X, y, datasets["data_unprocessed"][dataset]["did"])
-                self.upload_dataset()
-                return
-        print("no dataset found with the name "+str(wanted_dataset_name))
+        response = requests.get(self.url + "/json/data/unprocessed/0/normal", params={'api_key': self.apikey})
+        print(response.status_code)
+    #    datasets = json.loads(response.text)
+    #    for dataset in datasets["data_unprocessed"]:
+    #        print(datasets["data_unprocessed"][dataset])
+    #        if datasets["data_unprocessed"][dataset]["name"] == wanted_dataset_name: #als dataset met die naam gevonden is
+    #            dataset=self.download_dataset(datasets["data_unprocessed"][dataset]["did"])
+    #            qualities=self.calculate_data_qualities(dataset,datasets["data_unprocessed"][dataset]["did"])
+    #            qualities_xml=self.qualities_to_xml_format(qualities,datasets["data_unprocessed"][dataset]["did"])
+    #            self.upload_qualities(qualities_xml)
+    #            return
+    #    print("no dataset found with the name "+str(wanted_dataset_name))

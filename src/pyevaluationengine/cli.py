@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 import time
+from requests import api
 #from typing_extensions import runtime
 
 from requests.models import Response
@@ -78,7 +79,15 @@ def parse_args(args):
         default=0,
         help="procceses all datasets and then waits for a time and checks if there are more datasets, if there are repeat program inf not stops. runs if it is higher than 0",
     )
+    parser.add_argument( 
+        "-s",
+        "-process_singular",
+        type=int,
+        default=0,
+        help="if largert than 0, input a dataset name, if that dataset exist it will be procesd",
+    )
     return parser.parse_args(args)
+
 
 
 def setup_logging(loglevel):
@@ -127,6 +136,11 @@ def process_x_amount(url=config.defaults["url"],apikey=config.defaults["apikey"]
         _logger.info("executing main function for the "+str(i)+"th time")
         engine.process_one_dataset()
 
+def process_specific_dataset(url=config.defaults["url"],apikey=config.defaults["apikey"]):
+    engine=EvaluationEngine(url,apikey)
+    #engine.get_unprocessed_dataset_ids()
+    engine.process_input_dataset()
+
 
 if __name__ == "__main__":
     run()
@@ -134,6 +148,7 @@ if __name__ == "__main__":
     print_unproccesed=(parse_args(sys.argv[1:]).p)
     process=(parse_args(sys.argv[1:]).a)
     keep_prossesing=(parse_args(sys.argv[1:]).k)
+    process_singular=(parse_args(sys.argv[1:]).s)
     if amount_of_repeats > 0: #voert t=x keer eveluationengine.py uit kijk of dit correct is met wat script 2 zou moetten doen
         process_x_amount(config.testing["url"],config.testing["apikey"],amount_of_repeats)
     if print_unproccesed>0: #print lijst van unprocesd datasets
@@ -144,3 +159,5 @@ if __name__ == "__main__":
     if keep_prossesing>0:
         sleeptime=(parse_args(sys.argv[1:]).t)
         keep_proccesing_all(config.testing["url"],config.testing["apikey"],sleeptime)
+    if process_singular>0:
+        process_specific_dataset(config.testing["url"],config.testing["apikey"])
