@@ -170,13 +170,14 @@ class EvaluationEngine:
         wanted_dataset_name=input("Enter dataset name: ")
         response = requests.get(self.url + "/json/data/unprocessed/0/normal", params={'api_key': self.apikey})
         print(response.status_code)
-    #    datasets = json.loads(response.text)
-    #    for dataset in datasets["data_unprocessed"]:
-    #        print(datasets["data_unprocessed"][dataset])
-    #        if datasets["data_unprocessed"][dataset]["name"] == wanted_dataset_name: #als dataset met die naam gevonden is
-    #            dataset=self.download_dataset(datasets["data_unprocessed"][dataset]["did"])
-    #            qualities=self.calculate_data_qualities(dataset,datasets["data_unprocessed"][dataset]["did"])
-    #            qualities_xml=self.qualities_to_xml_format(qualities,datasets["data_unprocessed"][dataset]["did"])
-    #            self.upload_qualities(qualities_xml)
-    #            return
-    #    print("no dataset found with the name "+str(wanted_dataset_name))
+        datasets = json.loads(response.text)
+        for dataset in datasets["data_unprocessed"]:
+            print(datasets["data_unprocessed"][dataset]['did'])
+            if datasets["data_unprocessed"][dataset]["name"] == wanted_dataset_name: #als dataset met die naam gevonden is
+                did=datasets["data_unprocessed"][dataset]['did']
+                dataset=self.download_dataset(did)
+                qualities=self.calculate_data_qualities(dataset,did)
+                qualities_xml=self.qualities_to_xml_format(qualities,did)
+                self.upload_qualities(qualities_xml)
+                return
+        print("no dataset found with the name "+str(wanted_dataset_name))
