@@ -1,5 +1,5 @@
 defaults = {
-    "apikey": "",
+    "apikey": "null",
     "url": "https://www.openml.org/api/v1/",
 }
 

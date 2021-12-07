@@ -16,15 +16,30 @@ _logger = logging.getLogger(__name__)
 
 
 class EvaluationEngine:
+    """This class has contains all functionalities of the Evaluation Engine
+    and is the core of the library.
+
+    :param url: A string that points to the right openML URL. Defaults to the URL in config.py
+    :type url: str
+    :param apikey: A string that contains the API key to use for OpenML. Defaults to the API key in config.py
+    :type apikey: str
+    """
     def __init__(self, url=defaults["url"], apikey=defaults["apikey"]):
         self.url = url
         self.apikey = apikey
         self.evaluation_engine_id = 1 # will be changed later
         oml.config.server = url
         oml.config.apikey = apikey
+        logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
+        logging.basicConfig(
+            level=logging.INFO, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
+        )
 
-    # Get unprocessed IDs of unprocessed datasets
     def get_unprocessed_dataset_ids(self):
+        """Fetches a list of IDs of unprocessed datasets
+
+        :return: List of integers
+        """  
         _logger.info("Fetching IDs of unprocessed datasets")
 
         # Send request to OpenML server
@@ -47,16 +62,33 @@ class EvaluationEngine:
         
         return data_ids
 
-    # Downloads a dataset to OpenML cache and returns the ARFF dataset
     def download_dataset(self, data_id: int):
+        """Downloads a dataset to OpenML cache and returns the ARFF dataset.
+
+        :param data_id: The id of the dataset that needs to be downloaded
+        :type data_id: int
+
+        :return: A dictionary of the downloaded ARFF file 
+        :rtype: dictionary
+        """  
         _logger.info(f'Fetching dataset {data_id}')
         try:
             return arff.load(open(oml.datasets.get_dataset(data_id).data_file))
         except:
             _logger.error(f'Error while fetching dataset {data_id}')
 
-    # Calculate all necessary qualities and return the qualities
-    def calculate_data_qualities(self, dataset_arff, data_id):
+    
+    def calculate_data_qualities(self, dataset_arff, data_id: int):
+        """Calculate all necessary qualities and return the qualities
+
+        :param dataset_arff: The ARFF dataset in the form of a dictionary object
+        :type dataset_arff: dictionary
+
+        :param data_id: The id of the dataset that is being analyzed
+        :type data_id: int
+
+        :return: A list of qualities
+        """  
         x = dataset_arff['data']
 
         # Calculate all qualities using MFE
@@ -72,8 +104,17 @@ class EvaluationEngine:
 
         return qualities
     
-    # Convert the qualities of a dateset to the correct xml format
     def qualities_to_xml_format(self, qualities, data_id: int):
+        """Convert the qualities of a dateset to the correct xml format
+
+        :param qualities: The list of qualities of the dataset
+        :type qualities: dictionary
+
+        :param data_id: The id of the dataset
+        :type data_id: int
+
+        :return: An XML object that can be sent to the OpenML servers
+        """  
         xml  = OrderedDict()
         xml["oml:data_qualities"] = OrderedDict()
         xml["oml:data_qualities"]["@xmlns:oml"] = "http://openml.org/openml"
@@ -88,20 +129,26 @@ class EvaluationEngine:
             if not math.isnan(value) and not math.isinf(value):
                 quality["oml:value"] = value
             xml["oml:data_qualities"]["oml:quality"].append(quality)
-        
-        # TODO: This is not in the correct format yet
-        # Example is not complete: https://www.openml.org/api_docs#!/data/post_data_qualities
 
         return xmltodict.unparse(xml)
 
-    # Upload the qualities of the given dataset
     def upload_qualities(self, xmldata):
+        """Upload the qualities of the given dataset
+
+        :param xmldata: The data of the qualities that need to be uploaded in XML format
+        :type xmldata: xml
+
+        :return: An XML object that can be sent to the OpenML servers
+        """  
         _logger.info("Uploading qualities")
         response = requests.post(self.url + "/data/qualities", params={'api_key': self.apikey}, files={"description": xmldata})
         _logger.debug(f'Response: {response.text}')
 
-    # Process dataset
     def process_datasets(self):
+        """Method to start analyzing and process datasets. Fetches 
+        a list of unprocessed datasets first, and then processes
+        untill it runs out of datasets in the list.
+        """  
         data_ids = self.get_unprocessed_dataset_ids()
 
         for data_id in data_ids:
@@ -131,20 +178,3 @@ class EvaluationEngine:
                 self.upload_dataset()
                 return
         print("no dataset found with the name "+str(wanted_dataset_name))
-
-def setup_logging(loglevel):
-    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
-    logging.basicConfig(
-        level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
-    )
-
-
-def main():
-    setup_logging(logging.DEBUG)
-
-    engine = EvaluationEngine(testing['url'], testing['apikey'])
-    engine.process_datasets()
-    
-
-if __name__ == "__main__":
-    main()
