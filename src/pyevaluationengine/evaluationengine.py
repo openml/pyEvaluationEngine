@@ -3,6 +3,7 @@ import logging
 import sys
 import math
 import openml as oml
+from openml.datasets import dataset
 from pymfe.mfe import MFE
 from collections import OrderedDict
 import xmltodict
@@ -111,10 +112,11 @@ class EvaluationEngine:
 
     # Proces 1 dataset
     def process_one_dataset(self): #procceses only 1 dataset, dit word momenteel niet herkent in cli.py
-        data_ids =self.get_unprocessed_data_ids() #je haalt alles op maar gebruikt er 1, dit kan optimaler
-        X, y =self.download_dataset(data_ids[0])
-        data_qualities = self.calculate_data_qualities(X, y, data_ids[0])
-        self.upload_dataset()
+        data_ids = self.get_unprocessed_dataset_ids() #je haalt alles op maar gebruikt er 1, dit kan optimaler
+        dataset=self.download_dataset(data_ids[0])
+        qualities=self.calculate_data_qualities(dataset,data_ids[0])
+        qualities_xml=self.qualities_to_xml_format(qualities,data_ids[0])
+        self.upload_qualities(qualities_xml)
 
     #proces 1 specific dataset
     def process_specefic_dataset(self):
