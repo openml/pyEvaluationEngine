@@ -106,7 +106,7 @@ def run():
     main(sys.argv[1:])
 
 def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["apikey"]): 
-    response=requests.get(url+"/data/unprocessed/0/normal", params={"api_key":apikey})
+    response=requests.get(url+"/json/data/unprocessed/0/normal", params={"api_key":apikey})
     data=json.loads(response.text)
     print("the following datasets are unprocessed")
     for i in data["data_unprocessed"]:
