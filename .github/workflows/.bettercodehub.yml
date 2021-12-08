@@ -1,2 +1,2 @@
 exclude:
-  ./src/pyevaluationenging/cli.py
+- /src/pyevaluationenging/cli.py
