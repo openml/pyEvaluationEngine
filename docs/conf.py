@@ -10,6 +10,9 @@
 import os
 import sys
 import shutil
+import sphinx_bootstrap_theme
+import time
+import pyevaluationengine
 
 # -- Path setup --------------------------------------------------------------
 
@@ -87,15 +90,17 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "pyevaluationengine"
-copyright = "2021, TrisCC"
+project = "pyEvaluationEngine"
+copyright = "2021, LUDev"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # version: The short X.Y version.
+version = pyevaluationengine.__version__
 # release: The full version, including alpha/beta/rc tags.
+release = pyevaluationengine.__version__
 # If you don’t need the separation provided between version and release,
 # just set them both to the same value.
 try:
@@ -148,23 +153,68 @@ pygments_style = "sphinx"
 # If this is True, todo emits a warning for each TODO entries. The default is False.
 todo_emit_warnings = True
 
+autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "alabaster"
+html_theme = "bootstrap"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "sidebar_width": "300px",
-    "page_width": "1200px"
+    # Navigation bar title. (Default: ``project`` value)
+    "navbar_title": "pyEvaluationEngine",
+    # Tab name for entire site. (Default: "Site")
+    # 'navbar_site_name': "Site",
+    # A list of tuples containting pages to link to.  The value should
+    # be in the form [(name, page), ..]
+    "navbar_links": [
+        ("Start", "index"),
+        ("Contributing", "contributing"),
+        ("Changelog", "changelog"),
+        ("API", "api/modules"),
+    ],
+    # Render the next and previous page links in navbar. (Default: true)
+    "navbar_sidebarrel": False,
+    # Render the current pages TOC in the navbar. (Default: true)
+    "navbar_pagenav": False,
+    # Tab name for the current pages TOC. (Default: "Page")
+    "navbar_pagenav_name": "On this page",
+    # Global TOC depth for "site" navbar tab. (Default: 1)
+    # Switching to -1 shows all levels.
+    "globaltoc_depth": 1,
+    # Include hidden TOCs in Site navbar?
+    #
+    # Note: If this is "false", you cannot have mixed ``:hidden:`` and
+    # non-hidden ``toctree`` directives in the same page, or else the build
+    # will break.
+    #
+    # Values: "true" (default) or "false"
+    "globaltoc_includehidden": "false",
+    # HTML navbar class (Default: "navbar") to attach to <div> element.
+    # For black navbar, do "navbar navbar-inverse"
+    "navbar_class": "navbar",
+    # Fix navigation bar to top of page?
+    # Values: "true" (default) or "false"
+    "navbar_fixed_top": "true",
+    # Location of link to source.
+    # Options are "nav" (default), "footer" or anything else to exclude.
+    "source_link_position": "None",
+    # Bootswatch (http://bootswatch.com/) theme.
+    #
+    # Options are nothing with "" (default) or the name of a valid theme
+    # such as "amelia" or "cosmo".
+    "bootswatch_theme": "flatly",
+    # Choose Bootstrap version.
+    # Values: "3" (default) or "2" (in quotes)
+    "bootstrap_version": "3",
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
-# html_theme_path = []
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -229,7 +279,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "pyevaluationengine-doc"
+htmlhelp_basename = "pyEvaluationEngineDoc"
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -246,7 +296,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "user_guide.tex", "pyevaluationengine Documentation", "TrisCC", "manual")
+    ("index", "pyEvaluationEngine.tex", "pyEvaluationEngine Documentation", "LUDev", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
