@@ -124,7 +124,7 @@ class EvaluationEngine:
 
         for name, value, index in zip(qualities[0], qualities[1], range(len(qualities[0]))):
             quality = OrderedDict()
-            quality["oml:name"] = name
+            quality["oml:name"] = f'pymfe.{name}'
             quality["oml:feature_index"] = index
             if not math.isnan(value) and not math.isinf(value):
                 quality["oml:value"] = value
