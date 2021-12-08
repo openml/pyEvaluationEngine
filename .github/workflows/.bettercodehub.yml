@@ -1,0 +1,2 @@
+exclude:
+  ./src/pyevaluationenging/cli.py
