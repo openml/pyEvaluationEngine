@@ -25,7 +25,7 @@ def test_calculate_data_qualities():
     list_qualities = []
     path = 'tests/test_sets'
     test_file= open(os.path.join(path + '/test_890.csv'))
-    test_qualities = test_file.readlines() 
+    test_qualities = test_file.readlines()
     fp = open(os.path.join(path +'/cloud.arff'))
     dataset = arff.load(fp)
     qualities = instance.calculate_data_qualities(dataset, 0)
