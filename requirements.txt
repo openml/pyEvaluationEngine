@@ -9,3 +9,6 @@ wheel
 openml
 pymfe
 xmltodict
+liac-arff
+sphinx
+sphinx_bootstrap_theme
