@@ -3,6 +3,7 @@ import logging
 import sys
 import math
 import openml as oml
+from openml.datasets import dataset
 from pymfe.mfe import MFE
 from collections import OrderedDict
 import xmltodict
@@ -123,7 +124,7 @@ class EvaluationEngine:
 
         for name, value, index in zip(qualities[0], qualities[1], range(len(qualities[0]))):
             quality = OrderedDict()
-            quality["oml:name"] = name
+            quality["oml:name"] = f'pymfe.{name}'
             quality["oml:feature_index"] = index
             if not math.isnan(value) and not math.isinf(value):
                 quality["oml:value"] = value
@@ -155,3 +156,28 @@ class EvaluationEngine:
             qualities = self.calculate_data_qualities(dataset, data_id)
             qualities_xml = self.qualities_to_xml_format(qualities, data_id)
             self.upload_qualities(qualities_xml)
+
+    # Proces 1 dataset
+    def process_one_dataset(self): #procceses only 1 dataset, dit word momenteel niet herkent in cli.py
+        data_ids =self.get_unprocessed_dataset_ids() #je haalt alles op maar gebruikt er 1, dit kan optimaler
+        dataset=self.download_dataset(data_ids[0])
+        qualities=self.calculate_data_qualities(dataset,data_ids[0])
+        qualities_xml=self.qualities_to_xml_format(qualities,data_ids[0])
+        self.upload_qualities(qualities_xml)
+
+    #proces 1 specific dataset
+    def process_input_dataset(self):
+        wanted_dataset_name=input("Enter dataset name: ")
+        response = requests.get(self.url + "/json/data/unprocessed/0/normal", params={'api_key': self.apikey})
+        print(response.status_code)
+        datasets = json.loads(response.text)
+        for dataset in datasets["data_unprocessed"]:
+            print(datasets["data_unprocessed"][dataset]['did'])
+            if datasets["data_unprocessed"][dataset]["name"] == wanted_dataset_name: #als dataset met die naam gevonden is
+                did=datasets["data_unprocessed"][dataset]['did']
+                dataset=self.download_dataset(did)
+                qualities=self.calculate_data_qualities(dataset,did)
+                qualities_xml=self.qualities_to_xml_format(qualities,did)
+                self.upload_qualities(qualities_xml)
+                return
+        print("no dataset found with the name "+str(wanted_dataset_name))
