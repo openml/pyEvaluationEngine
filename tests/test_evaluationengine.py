@@ -17,8 +17,6 @@ def test_constructor():
     assert instance.url == defaults["url"]
     assert instance.apikey == defaults["apikey"]
 
-
-
 def test_calculate_data_qualities():
     #test calculate_data_qualities with dataset 'cload.arff' id = 890
     instance = EvaluationEngine()
@@ -34,3 +32,4 @@ def test_calculate_data_qualities():
 
 if __name__ == "__main__":
     test_calculate_data_qualities()
+
