@@ -3,7 +3,6 @@ import logging
 import sys
 import math
 import openml as oml
-from openml.datasets import dataset
 from pymfe.mfe import MFE
 from collections import OrderedDict
 import xmltodict
@@ -28,7 +27,7 @@ class EvaluationEngine:
     def __init__(self, url=defaults["url"], apikey=defaults["apikey"], loglevel=logging.INFO):
         self.url = url
         self.apikey = apikey
-        self.evaluation_engine_id = 1 # will be changed later
+        self.evaluation_engine_id = 1 # TODO: Specify the ID of this Evaluation Engine
         oml.config.server = url
         oml.config.apikey = apikey
         logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
