@@ -2,11 +2,9 @@ import pytest
 
 from pyevaluationengine.evaluationengine import EvaluationEngine
 from pyevaluationengine.config import testing, defaults
-import openml as oml
 
 import os
 import arff
-
 
 __author__ = "LUDev"
 __copyright__ = "LUDev"
@@ -19,42 +17,19 @@ def test_constructor():
     assert instance.url == defaults["url"]
     assert instance.apikey == defaults["apikey"]
 
-def get_test_data(dataset, filename):
-    data = dataset['data']
-    X = []
-    y = []
-    for row in data:
-        if filename == "Brainsize.arff":
-            X.append(row[1:])
-            y.append(row[0])
-        if filename == "hip.arff":
-            X.append(row)
-        if filename == "iq_brain_size - kopie.arff":
-            X.append(row[:-1])
-            y.append(row[len(row)-1])
-        if filename == "iq_brain_size.arff":
-            X.append(row[:-1])
-            y.append(row[len(row)-1])
-        if filename == "openml_filrev.arff":
-            X.append(row)
-        if filename == "red_wine.arff":
-            X.append(row)
-    return X,y
-
 def test_calculate_data_qualities():
+    #test calculate_data_qualities with dataset 'cload.arff' id = 890
     instance = EvaluationEngine()
     list_qualities = []
     path = 'tests/test_sets'
-    for filename in os.listdir(path):
-        fp = open(os.path.join(path,filename))
-        dataset = arff.load(fp)
-        list_qualities.append(instance.calculate_data_qualities(dataset, 0))
-    print(list_qualities)
-
-    # TODO: Fix this
-    # for qualities in list_qualities:
-    #     assert(qualities == ([],[]) or len(qualities[0]) > 0)
-
+    test_file= open(os.path.join(path + '/test_890.csv'))
+    test_qualities = test_file.readlines()
+    fp = open(os.path.join(path +'/cloud.arff'))
+    dataset = arff.load(fp)
+    qualities = instance.calculate_data_qualities(dataset, 0)
+    for quality, test_quality in zip(qualities[1], test_qualities):
+        assert quality == float(test_quality)
 
 if __name__ == "__main__":
     test_calculate_data_qualities()
+
