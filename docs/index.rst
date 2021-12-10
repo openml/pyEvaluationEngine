@@ -2,10 +2,7 @@
 pyEvaluationEngine
 ==================
 
-This is the documentation of **pyEvaluationEngine**.
-
-.. TODO: Write introduction to the package
-
+This is the documentation of **pyEvaluationEngine**. The package builds upon the OpenML project.
 
 Contents
 ========
@@ -23,11 +20,36 @@ Contents
 
 How to install pyEvaluationEngine
 =================================
-You can install the OpenML package via `pip`:
+You can install the package an CLI interface by using the provided setuptools.
 
 .. code:: bash
 
-    pip install pyevaluationengine
+    python setup.py install
+
+The entrypoint for scripts is the ``cli.py`` file. After installation, the scripts can be ran with ``pyevaluationengine``. For more specific information about parameters, add the ``-h`` flag.
+
+
+Usage
+=====
+The CLI has the following modes:
+
+config
+    Used to set the API key and URL. This command needs to be run before you can use any of the other scripts.
+
+all
+    Processes and analyzes all of the unprocessed datasets once.
+
+print
+    Prints all of the unprocessed datasets to the terminal.
+
+singular
+    Processes the specified dataset by name.
+
+amount
+    Processes a specified amount of datasets
+
+repeat
+    Processes all unprocessed datasets and repeats this after a specified timeout
 
 
 Further information

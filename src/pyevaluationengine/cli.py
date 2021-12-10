@@ -11,7 +11,7 @@ from pyevaluationengine.evaluationengine import EvaluationEngine
 from pyevaluationengine import config
 
 
-from .__version__ import __version__
+from pyevaluationengine.__version__ import __version__
 
 __author__ = "LUDev"
 __copyright__ = "LUDev"
@@ -33,6 +33,7 @@ def parse_args(args):
         help="set loglevel to INFO",
         action="store_const",
         const=logging.INFO,
+        default=logging.INFO,
     )
     parser.add_argument(
         "-vv",
@@ -41,6 +42,7 @@ def parse_args(args):
         help="set loglevel to DEBUG",
         action="store_const",
         const=logging.DEBUG,
+        default=logging.INFO,
     )
 
     # Sub-parsers for mode selection
@@ -179,6 +181,7 @@ def main():
     if args.mode == 'all':
         process_all(engine)
     elif args.mode == 'print':
+        setup_logging(logging.INFO)
         print_unproccesed_data(engine)
     elif args.mode == 'singular':
         process_specific_dataset(args.name, engine)
