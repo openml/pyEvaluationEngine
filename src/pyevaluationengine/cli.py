@@ -10,9 +10,6 @@ import requests
 from pyevaluationengine.evaluationengine import EvaluationEngine
 from pyevaluationengine import config
 
-
-from pyevaluationengine.__version__ import __version__
-
 __author__ = "LUDev"
 __copyright__ = "LUDev"
 __license__ = "BSD 3-Clause License"
@@ -24,7 +21,6 @@ def parse_args(args):
     parser.add_argument(
         "--version",
         action="version",
-        version="pyevaluationengine {ver}".format(ver=__version__),
     )
     parser.add_argument(
         "-v",
