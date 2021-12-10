@@ -10,6 +10,9 @@ source =
     */site-packages/
 
 [report]
+# Ignore cli
+omit = src/pyevaluationengine/cli.py
+
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
