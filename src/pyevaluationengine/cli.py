@@ -70,7 +70,6 @@ def parse_args(args):
         default=config.defaults["apikey"],
     )
 
-
     # Sub parser for all mode
     parser_all = sub_parsers.add_parser("all", help="All configuration")
 
@@ -82,6 +81,7 @@ def parse_args(args):
     parser_singular.add_argument( 
         "-n",
         "-name",
+        dest="name",
         type=str,
         required=True,
         help="Name of the to be processed dataset",
@@ -92,16 +92,18 @@ def parse_args(args):
     parser_repeat.add_argument( 
         "-n",
         "-number",
+        dest="number",
         type=int,
         default=5,
         help="Amount datasets to process, default is 5",
     )
 
-    # Sub parser for continuous mode
+    # Sub parser for repeat mode
     parser_repeat = sub_parsers.add_parser("repeat", help="Repeat configuration")
     parser_repeat.add_argument( 
         "-t",
         "-time",
+        dest="time",
         type=int,
         default=30,
         help="Amount of time to wait for new datasets in minutes, standard is 30",
@@ -120,53 +122,35 @@ def setup_logging(loglevel):
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
     )
 
-def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["apikey"]): 
-    response=requests.get(url+"/json/data/unprocessed/0/normal", params={"api_key":apikey})
-    data=json.loads(response.text)
-    print("the following datasets are unprocessed")
-    for i in data["data_unprocessed"]:
-        print(data["data_unprocessed"][i]["name"])
-    
-def process_all(url=config.defaults["url"],apikey=config.defaults["apikey"]): 
-    engine=EvaluationEngine(url, apikey)
+def process_all(engine: EvaluationEngine):
     engine.process_datasets()
 
-def keep_proccesing_all(url=config.defaults["url"],apikey=config.defaults["apikey"],sleeptime=30):
-    engine=EvaluationEngine(url, apikey)
-    while True:
-        response=requests.get(url+"/data/unprocessed/0/normal", params={"api_key":apikey})
-        data=json.loads(response.text)
-        if data["data_unprocessed"]=={}:
-            _logger.info("no more unprocessed data sets are left, ending program")
-            break
-        engine.process_datasets() #we kunnen nog niet goed testen omdat we nog niet uploaden
-        time.sleep(sleeptime)
-        _logger.info("sleep of "+str(sleeptime)+" has ended")
+def print_unproccesed_data(engine: EvaluationEngine):
+    dataset_ids = engine.get_unprocessed_dataset_ids()
+    for id in dataset_ids:
+        _logger.info(f"Unprocessed dataset: {id}")
+    
+def process_specific_dataset(dataset_name, engine: EvaluationEngine):
+    engine.process_input_dataset(dataset_name)
 
-def process_x_amount(url=config.defaults["url"],apikey=config.defaults["apikey"],amount_of_repeats=0):
-    engine=EvaluationEngine(url, apikey)
+def process_x_amount(amount_of_repeats, engine: EvaluationEngine):
     i=0
     while amount_of_repeats > i:
         i+=1
-        _logger.info("executing main function for the "+str(i)+"th time")
+        _logger.info(f"Processing a single dataset for the {i}th time.")
         engine.process_one_dataset()
 
-def process_specific_dataset(url=config.defaults["url"],apikey=config.defaults["apikey"]):
-    engine=EvaluationEngine(url,apikey)
-    #engine.get_unprocessed_dataset_ids()
-    engine.process_input_dataset()
+def keep_proccesing_all(sleeptime, engine: EvaluationEngine):
+    while True:
+        engine.process_datasets()
+        time.sleep(sleeptime * 60)
+        _logger.info("Sleep of " + str(sleeptime) + " minutes has ended")
 
 def main():
     args = parse_args(sys.argv[1:])
     setup_logging(args.loglevel)
 
-    if not os.path.isfile('cli_config.json'):
-        _logger.info("Config has nog been set. Run the config setter first.")
-        sys.exit(0)
- 
-    with open('cli_config.json', 'r') as config_file:
-        openml_config = json.load(config_file)
-
+    # Configuration setting has priority above normal modes
     if args.mode == 'config':
         _logger.info("Setting configuration:")
         _logger.info(f"APIKey: {args.apikey}")
@@ -177,35 +161,30 @@ def main():
                 "url": args.url
             }
             json.dump(contents, config_file, indent=2)
-        return
-    elif args.mode == 'all':
-        return
-    elif args.mode == 'print':
-        return
-    elif args.mode == 'singular':
-        return
-    elif args.mode == 'amount':
-        return
-    elif args.mode == 'repeat':
-        return
 
+    # Check if configuration file exists
+    if not os.path.isfile('cli_config.json'):
+        _logger.info("Config has nog been set. Run the config setter first.")
+        sys.exit(0)
+ 
+    # Load configuration file
+    with open('cli_config.json', 'r') as config_file:
+        openml_config = json.load(config_file)
+
+    # Initialize engine
+    engine = EvaluationEngine(openml_config.testing["url"],openml_config.testing["apikey"])
+
+    # Execute the right mode
+    if args.mode == 'all':
+        process_all(engine)
+    elif args.mode == 'print':
+        print_unproccesed_data(engine)
+    elif args.mode == 'singular':
+        process_specific_dataset(args.name, engine)
+    elif args.mode == 'amount':
+        process_x_amount(args.number, engine)
+    elif args.mode == 'repeat':
+        keep_proccesing_all(args.time, engine)
 
 if __name__ == "__main__":
     main()
-    # amount_of_repeats=(parse_args(sys.argv[1:]).n)
-    # print_unproccesed=(parse_args(sys.argv[1:]).p)
-    # process=(parse_args(sys.argv[1:]).a)
-    # keep_prossesing=(parse_args(sys.argv[1:]).k)
-    # process_singular=(parse_args(sys.argv[1:]).s)
-    # if amount_of_repeats > 0: #voert t=x keer eveluationengine.py uit kijk of dit correct is met wat script 2 zou moetten doen
-    #     process_x_amount(config.testing["url"],config.testing["apikey"],amount_of_repeats)
-    # if print_unproccesed>0: #print lijst van unprocesd datasets
-    #     print_unproccesed_data(config.testing["url"],config.testing["apikey"])
-    # if process>0: #process alle datasets
-        
-    #     process_all(config.testing["url"],config.testing["apikey"])
-    # if keep_prossesing>0:
-    #     sleeptime=(parse_args(sys.argv[1:]).t)
-    #     keep_proccesing_all(config.testing["url"],config.testing["apikey"],sleeptime)
-    # if process_singular>0:
-    #     process_specific_dataset(config.testing["url"],config.testing["apikey"])
