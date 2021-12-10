@@ -2,6 +2,3 @@ exclude:
 - /docs/.*
 - /setup.py
 - /src/pyevaluationengine/cli.py
-component_depth: 3
-languages:
-- python
