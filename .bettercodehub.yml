@@ -1,3 +1,6 @@
 exclude:
-- /src/pyevaluationenging/cli.py
-- /docs/*
+- /docs/.*
+- /setup.py
+- /src/pyevaluationengine/cli.py
+languages:
+- python
