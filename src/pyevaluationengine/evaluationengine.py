@@ -98,11 +98,11 @@ class EvaluationEngine:
         _logger.info(f'Calculating qualities of dataset {data_id}')
         try: 
             mfe = MFE(groups="all")
-            mfe.fit(x)
+            mfe.fit(x, suppress_warnings=True)
             qualities = mfe.extract(suppress_warnings=True)
+            _logger.info(f"Sucessfully calculated qualities of dataset {data_id}")
 
             for name, value in zip(qualities[0], qualities[1]):
-                _logger.info(f"Sucessfully calculated qualities of dataset {data_id}")
                 _logger.debug(f"{name} \t\t {value}")
         except:
             _logger.error(f'Error while calculating qualities of dataset {data_id}')
@@ -193,13 +193,17 @@ class EvaluationEngine:
             _logger.info(f"No dataset found with the name:  {dataset_name}")
             return
 
-        datasets = xmltodict.parse(response.text)
+        datasets = dict(xmltodict.parse(response.text))
 
-        if(len(datasets['oml:data']['oml:dataset']) > 1):
+        # Larger than 2 because extra header also counts as an item in XML
+        if len(datasets['oml:data']['oml:dataset']) > 1:
             _logger.info(f"Found more than one dataset with the name {dataset_name}. Analysing and processing the first occurence.")
 
-        
-        did=datasets['oml:data']['oml:dataset'][0]['oml:did']
+        if type(datasets['oml:data']['oml:dataset']) is OrderedDict:
+            did=datasets['oml:data']['oml:dataset']['oml:did']
+        else:
+            did=datasets['oml:data']['oml:dataset'][0]['oml:did']
+
         _logger.info(f"Analysing and processing dataset with did {did}")
 
         dataset=self.download_dataset(did)

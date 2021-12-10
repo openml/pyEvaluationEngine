@@ -143,8 +143,9 @@ def process_x_amount(amount_of_repeats, engine: EvaluationEngine):
 def keep_proccesing_all(sleeptime, engine: EvaluationEngine):
     while True:
         engine.process_datasets()
+        _logger.info("Sleeping for " + str(sleeptime) + " minutes.")
         time.sleep(sleeptime * 60)
-        _logger.info("Sleep of " + str(sleeptime) + " minutes has ended")
+        _logger.info("Sleep of " + str(sleeptime) + " minutes has ended.")
 
 def main():
     args = parse_args(sys.argv[1:])
@@ -172,7 +173,7 @@ def main():
         openml_config = json.load(config_file)
 
     # Initialize engine
-    engine = EvaluationEngine(openml_config.testing["url"],openml_config.testing["apikey"])
+    engine = EvaluationEngine(openml_config["url"],openml_config["apikey"])
 
     # Execute the right mode
     if args.mode == 'all':
