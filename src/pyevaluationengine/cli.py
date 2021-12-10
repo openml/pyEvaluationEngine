@@ -96,15 +96,6 @@ def setup_logging(loglevel):
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
     )
 
-
-def main(args):
-    args = parse_args(args)
-    setup_logging(args.loglevel)
-
-
-def run():
-    main(sys.argv[1:])
-
 def print_unproccesed_data(url=config.defaults["url"],apikey=config.defaults["apikey"]): 
     response=requests.get(url+"/json/data/unprocessed/0/normal", params={"api_key":apikey})
     data=json.loads(response.text)
@@ -141,6 +132,13 @@ def process_specific_dataset(url=config.defaults["url"],apikey=config.defaults["
     #engine.get_unprocessed_dataset_ids()
     engine.process_input_dataset()
 
+def main(args):
+    args = parse_args(args)
+    setup_logging(args.loglevel)
+
+
+def run():
+    main(sys.argv[1:])
 
 if __name__ == "__main__":
     run()
