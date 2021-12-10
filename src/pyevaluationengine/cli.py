@@ -11,7 +11,7 @@ from pyevaluationengine.evaluationengine import EvaluationEngine
 from pyevaluationengine import config
 
 
-from __version__ import __version__ #orgineel (.__version__ import ...) weet niet de reden voor die punt dus heb hem weg gehaald, comment voor het geval dat het dit iets sloopt
+from .__version__ import __version__
 
 __author__ = "LUDev"
 __copyright__ = "LUDev"
