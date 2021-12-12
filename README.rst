@@ -11,7 +11,7 @@ OpenML Python Evaluation Engine
 
 Python port of the OpenML `Evaluation Engine`_
 
-How to install pyEvaluationEngine
+Installation
 =================================
 You can install the package an CLI interface by using the provided setuptools.
 
@@ -21,6 +21,7 @@ You can install the package an CLI interface by using the provided setuptools.
 
 The entrypoint for scripts is the `cli.py` file. After installation, the scripts can be ran with ```pyevaluationengine```. For more specific information about parameters, add the ```-h``` flag.
 
+To see more specific instructions on how to install this package as a development dependency, we recommend looking the the CONTRIBURING file and follow some of the steps under the "Code Contributions" header.
 
 Usage
 =====
