@@ -19,7 +19,7 @@ def test_constructor():
 
 def test_calculate_data_qualities():
     #test calculate_data_qualities with dataset 'cload.arff' id = 890
-    instance = EvaluationEngine()
+    instance = EvaluationEngine(1)
     list_qualities = []
     path = 'tests/test_sets'
     test_file= open(os.path.join(path + '/test_890.csv'))
