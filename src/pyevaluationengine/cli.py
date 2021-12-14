@@ -15,6 +15,7 @@ __copyright__ = "LUDev"
 __license__ = "BSD 3-Clause License"
 
 _logger = logging.getLogger(__name__)
+
 def parse_args(args):
     # Top-level parser
     parser = argparse.ArgumentParser(description="Python EvaluationEngine for the OpenML project")
@@ -40,8 +41,16 @@ def parse_args(args):
         const=logging.DEBUG,
         default=logging.INFO,
     )
+    parser.add_argument( 
+        "-id",
+        dest="id",
+        type=int,
+        required=False,
+        default=1,
+        help="Id of the evaluation engine instance",
+    )
 
-    # Sub-parsers for mode selection
+    # Sub parsers for mode selection
     sub_parsers = parser.add_subparsers(
         title="Operating modes",
         description="Select the operating mode",
@@ -74,7 +83,7 @@ def parse_args(args):
     # Sub parser for print mode
     parser_print = sub_parsers.add_parser("print", help="Print configuration")
 
-    # Sub parser for singlular mode
+    # Sub parser for singular mode
     parser_singular = sub_parsers.add_parser("singular", help="Singular configuration")
     parser_singular.add_argument( 
         "-n",
@@ -171,7 +180,7 @@ def main():
         openml_config = json.load(config_file)
 
     # Initialize engine
-    engine = EvaluationEngine(openml_config["url"],openml_config["apikey"])
+    engine = EvaluationEngine(args.id, openml_config["url"],openml_config["apikey"])
 
     # Execute the right mode
     if args.mode == 'all':

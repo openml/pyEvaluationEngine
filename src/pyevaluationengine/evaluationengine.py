@@ -9,7 +9,7 @@ import xmltodict
 import requests
 import arff
 
-from pyevaluationengine.config import defaults, testing
+from pyevaluationengine.config import defaults, testing, pymfe_qualities_csv
 
 _logger = logging.getLogger(__name__)
 
@@ -24,10 +24,10 @@ class EvaluationEngine:
     :param apikey: A string that contains the API key to use for OpenML. Defaults to the API key in config.py
     :type apikey: str
     """
-    def __init__(self, url=defaults["url"], apikey=defaults["apikey"], loglevel=logging.INFO):
+    def __init__(self, id: int, url=defaults["url"], apikey=defaults["apikey"], loglevel=logging.INFO):
         self.url = url
         self.apikey = apikey
-        self.evaluation_engine_id = 1 # TODO: Specify the ID of this Evaluation Engine
+        self.engine_id = id
         oml.config.server = url
         oml.config.apikey = apikey
         logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
@@ -44,7 +44,7 @@ class EvaluationEngine:
         _logger.info("Fetching IDs of unprocessed datasets")
 
         # Send request to OpenML server
-        response = requests.get(self.url + "/json/data/unprocessed/0/normal", params={'api_key': self.apikey})
+        response = requests.post(self.url + f"/json/data/qualities/unprocessed/{self.engine_id}/normal", params={'api_key': self.apikey,'order':'normal', 'qualities': pymfe_qualities_csv})
         if response.status_code != 200:
             _logger.error('Could not fetch the IDs of unprocessed datasets')
             return []
@@ -102,8 +102,9 @@ class EvaluationEngine:
             qualities = mfe.extract(suppress_warnings=True)
             _logger.info(f"Sucessfully calculated qualities of dataset {data_id}")
 
-            for name, value in zip(qualities[0], qualities[1]):
-                _logger.debug(f"{name} \t\t {value}")
+            # Only comment this out for extensive analysis checking
+            # for name, value in zip(qualities[0], qualities[1]):
+            #     _logger.debug(f"{name} \t\t {value}")
         except:
             _logger.error(f'Error while calculating qualities of dataset {data_id}')
             return []
@@ -126,7 +127,7 @@ class EvaluationEngine:
         xml["oml:data_qualities"] = OrderedDict()
         xml["oml:data_qualities"]["@xmlns:oml"] = "http://openml.org/openml"
         xml["oml:data_qualities"]["oml:did"] = data_id
-        xml["oml:data_qualities"]["oml:evaluation_engine_id"] = self.evaluation_engine_id
+        xml["oml:data_qualities"]["oml:evaluation_engine_id"] = self.engine_id
         xml["oml:data_qualities"]["oml:quality"] = []
 
         for name, value in zip(qualities[0], qualities[1]):
@@ -175,6 +176,11 @@ class EvaluationEngine:
         # Fetching the full list is not efficient but a singluar 
         # unprocessed dataset fetch is not supported yet
         data_ids =self.get_unprocessed_dataset_ids()
+
+        if len(data_ids) == 0:
+            _logger.info("No datasets to be processed")
+            return
+        
         dataset=self.download_dataset(data_ids[0])
         qualities=self.calculate_data_qualities(dataset,data_ids[0])
         qualities_xml=self.qualities_to_xml_format(qualities,data_ids[0])
@@ -187,7 +193,7 @@ class EvaluationEngine:
         :param dataset_name: The name of the dataset
         :type data_id: str
         """
-        response = requests.get(self.url + f"data/list/data_name/{dataset_name}/limit/5", params={'api_key': self.apikey})
+        response = requests.get(self.url + f"/data/list/data_name/{dataset_name}/limit/5", params={'api_key': self.apikey})
 
         if response.status_code != 200:
             _logger.info(f"No dataset found with the name:  {dataset_name}")
