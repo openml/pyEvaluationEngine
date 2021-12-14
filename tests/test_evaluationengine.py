@@ -13,7 +13,7 @@ __license__ = "BSD 3-Clause License"
 
 def test_constructor():
     # test default constructor
-    instance = EvaluationEngine()
+    instance = EvaluationEngine(1)
     assert instance.url == defaults["url"]
     assert instance.apikey == defaults["apikey"]
 
