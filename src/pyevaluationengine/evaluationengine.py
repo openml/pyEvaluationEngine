@@ -44,7 +44,7 @@ class EvaluationEngine:
         _logger.info("Fetching IDs of unprocessed datasets")
 
         # Send request to OpenML server
-        response = requests.post(self.url + f"/data/qualities/unprocessed/{self.engine_id}/normal", params={'api_key': self.apikey, 'qualities': pymfe_qualities_csv}, json={'qualities': pymfe_qualities_csv})
+        response = requests.post(self.url + f"/data/qualities/unprocessed/{self.engine_id}/normal", params={'api_key': self.apikey, 'qualities': pymfe_qualities_csv})
         if response.status_code != 200:
             _logger.error('Could not fetch the IDs of unprocessed datasets')
             return []
