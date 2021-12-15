@@ -2,24 +2,21 @@
 OpenML Python Evaluation Engine
 ===============================
 
-.. image:: https://bettercodehub.com/edge/badge/ludev-nl/2021-01-pyEvaluationEngine?branch=main&token=58083074baa0540750d07ec29a934529753b565a
-    :target: https://bettercodehub.com/
-
-.. image:: https://github.com/ludev-nl/2021-01-pyEvaluationEngine/actions/workflows/tox.yml/badge.svg?branch=main
-    :target: https://github.com/ludev-nl/2021-01-pyEvaluationEngine/actions/workflows/tox.yml
+.. image:: https://github.com/openml/pyEvaluationEngine/actions/workflows/tox.yml/badge.svg
+    :target: https://github.com/openml/pyEvaluationEngine/actions/workflows/tox.yml
 
 
 Python port of the OpenML `Evaluation Engine`_
 
 Installation
 =================================
-You can install the package an CLI interface by using the provided setuptools.
+Preferably you want to setup a virtual environment first to prevent the package from being installed to your global python installation. You can install the package with the CLI interface by using the provided setuptools.
 
 .. code:: bash
 
     python setup.py install
 
-The entrypoint for scripts is the `cli.py` file. After installation, the scripts can be ran with ```pyevaluationengine```. For more specific information about parameters, add the ```-h``` flag.
+After installation, the scripts can be ran with `pyevaluationengine`. For more specific information about parameters, add the `-h` flag. The entrypoint for scripts is configured to be the `cli.py` file.
 
 To see more specific instructions on how to install this package as a development dependency, we recommend looking the the CONTRIBURING file and follow some of the steps under the "Code Contributions" header.
 
