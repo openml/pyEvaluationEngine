@@ -41,14 +41,6 @@ def parse_args(args):
         const=logging.DEBUG,
         default=logging.INFO,
     )
-    parser.add_argument( 
-        "-id",
-        dest="id",
-        type=int,
-        required=False,
-        default=1,
-        help="Id of the evaluation engine instance",
-    )
 
     # Sub parsers for mode selection
     sub_parsers = parser.add_subparsers(
@@ -75,6 +67,14 @@ def parse_args(args):
         help="OpenML API key",
         required=True,
         default=config.defaults["apikey"],
+    )
+    parser.add_argument( 
+        "-id",
+        dest="id",
+        type=int,
+        required=False,
+        default=1,
+        help="Id of the evaluation engine instance",
     )
 
     # Sub parser for all mode
@@ -166,7 +166,8 @@ def main():
         with open('cli_config.json', 'w') as config_file:
             contents = {
                 "apikey": args.apikey,
-                "url": args.url
+                "url": args.url,
+                "id": args.id
             }
             json.dump(contents, config_file, indent=2)
 
@@ -180,7 +181,7 @@ def main():
         openml_config = json.load(config_file)
 
     # Initialize engine
-    engine = EvaluationEngine(args.id, openml_config["url"],openml_config["apikey"])
+    engine = EvaluationEngine(openml_config["id"], openml_config["url"],openml_config["apikey"])
 
     # Execute the right mode
     if args.mode == 'all':

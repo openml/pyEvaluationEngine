@@ -24,7 +24,7 @@ class EvaluationEngine:
     :param apikey: A string that contains the API key to use for OpenML. Defaults to the API key in config.py
     :type apikey: str
     """
-    def __init__(self, id: int, url=defaults["url"], apikey=defaults["apikey"], loglevel=logging.INFO):
+    def __init__(self, id:int=1, url=defaults["url"], apikey=defaults["apikey"], loglevel=logging.INFO):
         self.url = url
         self.apikey = apikey
         self.engine_id = id
@@ -44,17 +44,20 @@ class EvaluationEngine:
         _logger.info("Fetching IDs of unprocessed datasets")
 
         # Send request to OpenML server
-        response = requests.post(self.url + f"/json/data/qualities/unprocessed/{self.engine_id}/normal", params={'api_key': self.apikey,'order':'normal', 'qualities': pymfe_qualities_csv})
+        response = requests.post(self.url + f"/data/qualities/unprocessed/{self.engine_id}/normal", params={'api_key': self.apikey, 'qualities': pymfe_qualities_csv}, json={'qualities': pymfe_qualities_csv})
         if response.status_code != 200:
             _logger.error('Could not fetch the IDs of unprocessed datasets')
             return []
 
         # Parse requests
-        datasets = json.loads(response.text)
+        datasets = dict(xmltodict.parse(response.text))
         data_ids = []
-        for key in datasets['data_unprocessed']:
-            data_ids.append(int(datasets['data_unprocessed'][key]['did']))
-        
+        if type(datasets['oml:data_unprocessed']['oml:dataset']) is OrderedDict:
+                data_ids.append(datasets['oml:data_unprocessed']['oml:dataset']['oml:did'])
+        else:
+            for dataset in datasets['oml:data_unprocessed']['oml:dataset'][0]:
+                data_ids.append(int(dataset['did']))
+             
         # Logging
         if not data_ids:
             _logger.info('No unprocessed datasets found')
