@@ -19,6 +19,8 @@ class EvaluationEngine:
     This class has contains all functionalities of the Evaluation Engine
     and is the core of the library.
 
+    :param id: The ID that the EvaluationEngine needs to use for requesting jobs. Defaults to 1.
+    :type id: int
     :param url: A string that points to the right openML URL. Defaults to the URL in config.py
     :type url: str
     :param apikey: A string that contains the API key to use for OpenML. Defaults to the API key in config.py
@@ -44,7 +46,7 @@ class EvaluationEngine:
         _logger.info("Fetching IDs of unprocessed datasets")
 
         # Send request to OpenML server
-        response = requests.post(self.url + f"/data/qualities/unprocessed/{self.engine_id}/normal", params={'api_key': self.apikey, 'qualities': pymfe_qualities_csv})
+        response = requests.post(self.url + f"/data/qualities/unprocessed/{self.engine_id}/normal", params={'api_key': self.apikey}, data={'qualities': pymfe_qualities_csv})
         if response.status_code != 200:
             _logger.error('Could not fetch the IDs of unprocessed datasets')
             return []
