@@ -16,7 +16,7 @@ Preferably you want to setup a virtual environment first to prevent the package 
 
     python setup.py install
 
-After installation, the scripts can be ran with `pyevaluationengine`. For more specific information about parameters, add the `-h` flag. The entrypoint for scripts is configured to be the `cli.py` file.
+After installation, the scripts can be ran with ```pyevaluationengine```. For more specific information about parameters, add the `-h` flag. The entrypoint for scripts is configured to be the `cli.py` file.
 
 To see more specific instructions on how to install this package as a development dependency, we recommend looking the the CONTRIBURING file and follow some of the steps under the "Code Contributions" header.
 
